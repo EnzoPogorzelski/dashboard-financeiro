@@ -1,18 +1,34 @@
-# Dashboard Financeiro Protegido
+# Dashboard Financeiro Editável
 
-Este pacote contém uma versão estática do dashboard financeiro com tela de senha.
+Esta versão foi feita para GitHub Pages e permite atualizar o dashboard sem editar código.
 
-## Como publicar no GitHub Pages
+## Como publicar
 
-1. Crie um repositório no GitHub.
-2. Envie os arquivos `index.html` e `.nojekyll`.
-3. Vá em **Settings > Pages**.
-4. Em **Build and deployment**, escolha **Deploy from a branch**.
-5. Selecione a branch `main` e a pasta `/root`.
-6. Abra o link publicado pelo GitHub Pages.
+Suba apenas estes arquivos no GitHub:
 
-## Observação importante
+- `index.html`
+- `.nojekyll`
+- `README.md`
 
-O dashboard foi criptografado dentro do `index.html`. A senha não está escrita no arquivo.
+Depois ative o GitHub Pages em **Settings > Pages > Deploy from a branch > main > /root**.
 
-Por ser um site estático, não existe login com servidor, usuários, recuperação de senha ou bloqueio por tentativas. Para proteção mais forte, use uma solução com autenticação real, como Cloudflare Access, Netlify/Vercel com autenticação, Firebase Auth ou uma aplicação com backend.
+## Como atualizar os dados
+
+1. Abra o site publicado.
+2. Digite a senha inicial: `Enzo@Financeiro2026`.
+3. Vá em **Importar/Backup**.
+4. Importe uma planilha `.xlsx` ou `.csv` com as colunas:
+   - Mês
+   - Tipo
+   - Bloco
+   - Categoria
+   - Item
+   - Valor
+   - Observações
+5. O dashboard será atualizado automaticamente.
+
+## Importante
+
+Não suba a planilha financeira preenchida em repositório público. Mantenha a planilha no seu computador e importe pelo site quando precisar atualizar.
+
+Os dados importados ficam salvos no navegador usado para acessar o site, de forma criptografada com a senha de acesso. Em outro dispositivo, será necessário importar novamente ou usar um backup.
