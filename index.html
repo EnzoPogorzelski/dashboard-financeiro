@@ -3,1215 +3,192 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Portal Pessoal | Financeiro e Dieta</title>
-  <meta name="robots" content="noindex, nofollow" />
+  <title>Portal Pessoal Enzo | Financeiro, Dieta e Treino</title>
+  <meta name="robots" content="noindex,nofollow" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
-    :root {
-      --bg: #03050c;
-      --panel: rgba(8, 13, 28, .90);
-      --panel2: rgba(4, 7, 16, .94);
-      --panel3: rgba(15, 23, 42, .74);
-      --stroke: rgba(125, 211, 252, .16);
-      --stroke2: rgba(148, 163, 184, .16);
-      --text: #f8fafc;
-      --muted: #94a3b8;
-      --muted2: #64748b;
-      --brand: #22d3ee;
-      --brand2: #8b5cf6;
-      --good: #22c55e;
-      --bad: #fb7185;
-      --warn: #f59e0b;
-      --blue: #60a5fa;
-      --chip: rgba(34, 211, 238, .10);
-      --shadow: 0 28px 90px rgba(0,0,0,.62);
-      --glow: 0 0 0 1px rgba(34,211,238,.08), 0 18px 70px rgba(2,6,23,.75);
-      --radius: 24px;
+    :root{
+      --bg:#030303; --bg2:#08090d; --panel:#0b0d12; --panel2:#10131b; --panel3:#151923;
+      --stroke:rgba(255,255,255,.10); --stroke-red:rgba(255,35,55,.44);
+      --text:#f6f7fb; --muted:#a2a6b3; --muted2:#6d7280;
+      --red:#ff2438; --red2:#b51220; --red3:#6e0a14; --good:#21d07a; --warn:#f59e0b; --blue:#60a5fa;
+      --shadow:0 24px 80px rgba(0,0,0,.70); --glow:0 0 36px rgba(255,36,56,.22);
+      --radius:18px; --radius2:26px; --side:284px;
     }
-    * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-    body {
-      margin: 0;
-      min-height: 100vh;
-      color: var(--text);
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background:
-        radial-gradient(circle at 12% 0%, rgba(34, 211, 238, .16), transparent 25rem),
-        radial-gradient(circle at 88% 2%, rgba(139, 92, 246, .16), transparent 30rem),
-        radial-gradient(circle at 50% 105%, rgba(14, 165, 233, .08), transparent 38rem),
-        linear-gradient(145deg, #01030a 0%, #03050c 45%, #070b16 100%);
-    }
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      background-image:
-        linear-gradient(rgba(125,211,252,.035) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(125,211,252,.025) 1px, transparent 1px);
-      background-size: 42px 42px;
-      mask-image: radial-gradient(circle at center, black, transparent 80%);
-    }
-    a { color: #7dd3fc; }
-    .hidden { display: none !important; }
-    .login-wrap {
-      min-height: 100vh;
-      display: grid;
-      place-items: center;
-      padding: 22px;
-      position: relative;
-      z-index: 1;
-    }
-    .login-card, .card, .nav, .topbar {
-      border: 1px solid var(--stroke);
-      background: linear-gradient(145deg, rgba(8,13,28,.94), rgba(5,9,20,.84));
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(16px);
-    }
-    .login-card {
-      width: min(520px, 100%);
-      border-radius: 30px;
-      padding: 32px;
-    }
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      width: fit-content;
-      padding: 8px 12px;
-      border-radius: 999px;
-      color: #bae6fd;
-      background: rgba(56,189,248,.11);
-      border: 1px solid rgba(56,189,248,.28);
-      font-size: 13px;
-      font-weight: 850;
-      margin-bottom: 18px;
-    }
-    h1, h2, h3 { margin: 0; letter-spacing: -0.035em; }
-    h1 { font-size: clamp(32px, 5vw, 50px); line-height: 1.02; }
-    h2 { font-size: clamp(23px, 4vw, 34px); line-height: 1.05; }
-    h3 { font-size: 16px; line-height: 1.25; }
-    p { color: var(--muted); line-height: 1.6; margin: 10px 0 0; }
-    label { display: block; margin-bottom: 7px; color: #dbeafe; font-size: 13px; font-weight: 800; }
-    input, select, textarea {
-      width: 100%;
-      outline: none;
-      border: 1px solid var(--stroke);
-      border-radius: 14px;
-      color: var(--text);
-      background: rgba(1, 3, 10, .72);
-      padding: 12px 13px;
-      font-size: 14px;
-    }
-    textarea { min-height: 86px; resize: vertical; }
-    input:focus, select:focus, textarea:focus {
-      border-color: rgba(56,189,248,.75);
-      box-shadow: 0 0 0 4px rgba(56,189,248,.10);
-    }
-    input[type="file"] { padding: 10px; }
-    button, .buttonlike {
-      border: 0;
-      cursor: pointer;
-      color: #031018;
-      background: linear-gradient(135deg, var(--brand), var(--brand2));
-      font-weight: 900;
-      border-radius: 14px;
-      padding: 12px 15px;
-      font-size: 14px;
-      white-space: nowrap;
-      box-shadow: 0 12px 32px rgba(56,189,248,.18);
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-    button.secondary, .buttonlike.secondary {
-      color: var(--text);
-      background: rgba(148, 163, 184, .13);
-      border: 1px solid var(--stroke);
-      box-shadow: none;
-    }
-    button.danger { background: rgba(251, 113, 133, .16); color: #fecdd3; border: 1px solid rgba(251,113,133,.28); box-shadow: none; }
-    button.small { padding: 8px 10px; font-size: 12px; border-radius: 10px; }
-    .login-row { display: flex; gap: 10px; margin-top: 18px; }
-    .error { color: #fecdd3; margin-top: 12px; min-height: 20px; font-size: 13px; }
-    .hint { color: var(--muted); font-size: 12px; margin-top: 10px; }
-    .app {
-      position: relative;
-      z-index: 1;
-      width: min(1500px, 100%);
-      margin: 0 auto;
-      padding: 22px;
-    }
-    header.topbar {
-      border-radius: 26px;
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 18px;
-      padding: 20px;
-      margin-bottom: 16px;
-    }
-    .actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
-    .nav {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      padding: 8px;
-      border-radius: 20px;
-      margin-bottom: 16px;
-      box-shadow: var(--glow);
-      position: sticky;
-      top: 10px;
-      z-index: 10;
-    }
-    .tab {
-      color: #cbd5e1;
-      border: 1px solid transparent;
-      background: transparent;
-      box-shadow: none;
-    }
-    .tab.active {
-      color: #031018;
-      background: linear-gradient(135deg, var(--brand), var(--brand2));
-      border: 0;
-      box-shadow: 0 12px 32px rgba(56,189,248,.16);
-    }
-    .grid { display: grid; gap: 16px; }
-    .grid.kpi { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-    .grid.two { grid-template-columns: minmax(0, 1.25fr) minmax(320px, .75fr); }
-    .grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    .grid.form { grid-template-columns: repeat(4, minmax(160px, 1fr)); align-items: end; }
-    .card {
-      border-radius: var(--radius);
-      padding: 18px;
-      box-shadow: var(--glow);
-    }
-    .section-title { display:flex; justify-content:space-between; gap:12px; align-items:flex-start; margin-bottom:14px; }
-    .kpi-card { min-height: 132px; display: flex; flex-direction: column; justify-content: space-between; }
-    .kpi-card .label { color: var(--muted); font-size: 13px; font-weight: 800; }
-    .kpi-card .value { font-size: clamp(24px, 3vw, 36px); font-weight: 950; letter-spacing: -0.055em; margin-top: 8px; }
-    .kpi-card .sub { color: var(--muted); font-size: 12px; margin-top: 8px; }
-    .value.good { color: #86efac; }
-    .value.bad { color: #fda4af; }
-    .value.warn { color: #fcd34d; }
-    .toolbar { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; margin-bottom: 14px; }
-    .field { min-width: 160px; flex: 1; }
-    .field.tiny { min-width: 120px; max-width: 150px; }
-    .field.small-field { max-width: 180px; }
-    .table-wrap { overflow: auto; border-radius: 18px; border: 1px solid var(--stroke); background: rgba(1,3,10,.54); }
-    table { width: 100%; border-collapse: collapse; min-width: 940px; }
-    th, td { padding: 12px 12px; border-bottom: 1px solid rgba(148, 163, 184, .14); text-align: left; vertical-align: middle; }
-    th { color: #c4d2ea; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; background: rgba(5,9,20,.96); position: sticky; top: 0; z-index: 1; }
-    td { color: #e2e8f0; font-size: 13px; }
-    tr:hover td { background: rgba(34,211,238,.06); }
-    td input, td select { min-width: 130px; padding: 9px 10px; }
-    td .money-input, td .num-input { min-width: 100px; }
-    .pill {
-      display: inline-flex;
-      padding: 5px 9px;
-      border-radius: 999px;
-      color: #bae6fd;
-      background: var(--chip);
-      border: 1px solid rgba(56,189,248,.20);
-      font-size: 12px;
-      font-weight: 800;
-    }
-    .pill.good { color:#bbf7d0; background:rgba(34,197,94,.12); border-color:rgba(34,197,94,.22); }
-    .pill.bad { color:#fecdd3; background:rgba(251,113,133,.12); border-color:rgba(251,113,133,.22); }
-    .pill.warn { color:#fde68a; background:rgba(245,158,11,.12); border-color:rgba(245,158,11,.22); }
-    .empty {
-      padding: 34px;
-      text-align: center;
-      color: var(--muted);
-      border: 1px dashed var(--stroke);
-      border-radius: 20px;
-      background: rgba(1,3,10,.48);
-    }
-    .notice {
-      border: 1px solid rgba(245, 158, 11, .30);
-      background: rgba(245, 158, 11, .10);
-      color: #fde68a;
-      padding: 14px;
-      border-radius: 18px;
-      margin-bottom: 14px;
-      line-height: 1.5;
-      font-size: 13px;
-    }
-    .success {
-      border: 1px solid rgba(34, 197, 94, .30);
-      background: rgba(34, 197, 94, .10);
-      color: #bbf7d0;
-      padding: 14px;
-      border-radius: 18px;
-      margin-bottom: 14px;
-      line-height: 1.5;
-      font-size: 13px;
-    }
-    .filebox {
-      border: 1px dashed rgba(125,211,252,.30);
-      background: rgba(1,3,10,.36);
-      border-radius: 20px;
-      padding: 16px;
-    }
-    .status-line { color: var(--muted); font-size: 12px; margin-top: 10px; }
-    .chartbox { height: 320px; position: relative; }
-    .chartbox.small { height: 260px; }
-    .mini-list { display: grid; gap: 10px; margin-top: 10px; }
-    .mini-row { display:flex; justify-content:space-between; align-items:center; gap:12px; padding: 11px 0; border-bottom: 1px solid rgba(148,163,184,.12); }
-    .mini-row:last-child { border-bottom:0; }
-    .mini-row strong { font-size: 13px; }
-    .mini-row span { color: var(--muted); font-size: 12px; }
-    .divider { height:1px; background:rgba(148,163,184,.14); margin: 16px 0; }
-    code {
-      display: inline-block;
-      color: #bae6fd;
-      background: rgba(56,189,248,.10);
-      border: 1px solid rgba(56,189,248,.18);
-      padding: 2px 6px;
-      border-radius: 8px;
-      font-size: 12px;
-    }
-    .template-links { display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
-    @media (max-width: 1080px) {
-      .grid.kpi, .grid.three, .grid.two, .grid.form { grid-template-columns: 1fr 1fr; }
-      header.topbar { flex-direction: column; }
-      .actions { justify-content:flex-start; }
-    }
-    @media (max-width: 720px) {
-      .app { padding: 12px; }
-      .login-card { padding: 24px; }
-      .login-row, .toolbar, .section-title { flex-direction: column; align-items: stretch; }
-      .grid.kpi, .grid.three, .grid.two, .grid.form { grid-template-columns: 1fr; }
-      button, .buttonlike { width: 100%; }
-      .field.small-field, .field.tiny { max-width: none; }
-      .nav { position: static; }
-    }
+    *{box-sizing:border-box} html{scroll-behavior:smooth} body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;}
+    body:before{content:"";position:fixed;inset:0;pointer-events:none;background:
+      radial-gradient(circle at 82% -8%,rgba(255,36,56,.20),transparent 25rem),
+      radial-gradient(circle at 6% 10%,rgba(180,18,32,.18),transparent 30rem),
+      linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px),
+      linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px);
+      background-size:auto,auto,48px 48px,48px 48px;mask-image:radial-gradient(circle at center,#000 0%,transparent 82%)}
+    .hidden{display:none!important} .muted{color:var(--muted)} .red{color:var(--red)}
+    button,input,select,textarea{font:inherit;color:inherit} button{cursor:pointer}
+    .login-wrap{min-height:100vh;display:grid;place-items:center;padding:24px;position:relative;z-index:1}
+    .login-card{width:min(560px,100%);background:linear-gradient(150deg,rgba(16,19,27,.98),rgba(7,8,12,.95));border:1px solid var(--stroke);border-radius:32px;box-shadow:var(--shadow);padding:36px;position:relative;overflow:hidden}
+    .login-card:before{content:"";position:absolute;inset:-2px;background:radial-gradient(circle at 80% 0%,rgba(255,36,56,.24),transparent 20rem);pointer-events:none}.login-card>*{position:relative}.badge{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--stroke-red);background:rgba(255,36,56,.10);border-radius:999px;padding:9px 14px;color:#ffd3d7;font-weight:800;font-size:13px;letter-spacing:.01em}.login-card h1{font-size:clamp(36px,7vw,58px);line-height:.95;margin:24px 0 14px}.login-card p{color:var(--muted);font-size:18px;line-height:1.55;margin:0 0 26px}.login-grid{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:end}.field label{display:block;font-size:13px;font-weight:800;color:#cfd3df;margin:0 0 8px}.input,.select,.textarea{width:100%;background:#05060a;border:1px solid var(--stroke);border-radius:14px;padding:12px 14px;outline:none;transition:.18s}.input:focus,.select:focus,.textarea:focus{border-color:var(--red);box-shadow:0 0 0 4px rgba(255,36,56,.10)}.btn{border:0;border-radius:14px;background:linear-gradient(135deg,var(--red),#ff5968);color:white;font-weight:900;padding:12px 16px;box-shadow:0 12px 30px rgba(255,36,56,.22)}.btn.secondary{background:#0a0c12;border:1px solid var(--stroke);box-shadow:none;color:#f1f3f8}.btn.ghost{background:rgba(255,36,56,.08);border:1px solid rgba(255,36,56,.25);box-shadow:none;color:#ffd5d9}.error{margin-top:14px;color:#ff9aa3;font-size:13px;font-weight:700}.hint{margin-top:22px!important;font-size:13px!important;color:#858b98!important}
+    .app{min-height:100vh;display:grid;grid-template-columns:var(--side) 1fr;position:relative;z-index:1}.sidebar{position:sticky;top:0;height:100vh;background:linear-gradient(180deg,rgba(9,10,14,.98),rgba(3,3,3,.98));border-right:1px solid var(--stroke);box-shadow:18px 0 60px rgba(0,0,0,.38);padding:22px 18px;overflow:auto}.logo{padding:0 6px 22px;border-bottom:1px solid var(--stroke);margin-bottom:18px}.logo small{display:block;color:#d8dbe4;font-weight:900;letter-spacing:.12em}.logo strong{display:block;font-size:32px;line-height:1;color:var(--red);letter-spacing:.03em;text-shadow:var(--glow)}.nav-section{margin:18px 0 10px}.nav-label{display:flex;align-items:center;justify-content:space-between;color:#8b909c;font-size:12px;text-transform:uppercase;letter-spacing:.09em;margin:0 2px 8px}.nav-item{width:100%;display:flex;align-items:center;gap:11px;border:1px solid transparent;background:transparent;color:#e6e8ee;text-align:left;border-radius:13px;padding:10px 11px;margin:4px 0;transition:.16s}.nav-item:hover{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.08)}.nav-item.active{background:linear-gradient(90deg,rgba(255,36,56,.24),rgba(255,36,56,.07));border-color:rgba(255,36,56,.55);box-shadow:0 0 0 1px rgba(255,36,56,.12),0 18px 40px rgba(255,36,56,.12);color:#fff}.nav-icon{width:22px;text-align:center;color:#ff6874}.submenu{display:none;margin-left:13px;border-left:1px solid rgba(255,255,255,.08);padding-left:10px}.submenu.open{display:block}.submenu .nav-item{font-size:14px;padding:8px 10px}.logout{margin-top:20px;width:100%;}
+    .main{min-width:0;padding:26px 28px 34px}.topbar{height:64px;background:rgba(7,8,12,.72);border:1px solid var(--stroke);border-radius:22px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;margin-bottom:22px;backdrop-filter:blur(14px)}.topbar h2{margin:0;font-size:18px}.top-actions{display:flex;gap:10px;align-items:center}.pill{display:inline-flex;align-items:center;gap:8px;background:#07080d;border:1px solid var(--stroke);border-radius:999px;padding:9px 12px;color:#cfd3df;font-size:13px}.page-head{display:flex;justify-content:space-between;gap:18px;align-items:end;margin:0 0 22px}.page-head h1{font-size:clamp(28px,4vw,44px);margin:0;line-height:1}.page-head p{margin:8px 0 0;color:var(--muted)}.grid{display:grid;gap:14px}.kpis{grid-template-columns:repeat(4,minmax(0,1fr));margin-bottom:14px}.card{background:linear-gradient(155deg,rgba(17,20,29,.92),rgba(7,8,12,.90));border:1px solid var(--stroke);border-radius:var(--radius);box-shadow:0 20px 52px rgba(0,0,0,.38);padding:18px;min-width:0}.card.hot{border-color:rgba(255,36,56,.35);box-shadow:0 20px 62px rgba(255,36,56,.06)}.kpi-title{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:#a2a6b3;margin-bottom:8px}.kpi-value{font-size:28px;font-weight:950}.kpi-sub{font-size:13px;color:var(--muted);margin-top:5px}.kpi-value .small{font-size:16px;color:var(--red)}.section-title{display:flex;align-items:center;justify-content:space-between;margin:0 0 14px}.section-title h3{margin:0;color:#fff}.section-title h3 span{color:var(--red);margin-right:8px}.layout-2{grid-template-columns:minmax(0,1.2fr) minmax(360px,.8fr)}.layout-3{grid-template-columns:repeat(3,minmax(0,1fr))}.table-wrap{overflow:auto;border:1px solid rgba(255,255,255,.08);border-radius:15px}table{width:100%;border-collapse:collapse;min-width:720px}th,td{padding:12px 12px;border-bottom:1px solid rgba(255,255,255,.07);text-align:left;font-size:14px}th{background:rgba(255,255,255,.04);color:#cbd0dc;font-size:12px;text-transform:uppercase;letter-spacing:.07em}td.value{font-weight:850}.tag{display:inline-flex;border-radius:999px;padding:5px 9px;border:1px solid rgba(255,36,56,.32);background:rgba(255,36,56,.10);font-size:12px;font-weight:800;color:#ffd7db}.tag.good{border-color:rgba(33,208,122,.35);background:rgba(33,208,122,.10);color:#c8ffe0}.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.form-grid .full{grid-column:1/-1}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}.textarea{min-height:86px;resize:vertical}.danger{background:rgba(255,36,56,.12);border:1px solid rgba(255,36,56,.30);color:#ffd5d9}.mini-btn{border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);padding:7px 9px;border-radius:10px;color:#f3f4f6}.mini-btn:hover{border-color:rgba(255,36,56,.5)}canvas{width:100%!important;max-height:320px}.chart-card{min-height:350px}.empty{padding:26px;text-align:center;color:var(--muted);border:1px dashed rgba(255,255,255,.12);border-radius:16px}.divider{height:1px;background:rgba(255,255,255,.08);margin:15px 0}.filebox{border:1px dashed rgba(255,36,56,.35);background:rgba(255,36,56,.06);border-radius:18px;padding:16px}.filebox input{margin-top:10px;width:100%}.footer{margin-top:22px;color:#777d8a;font-size:12px;display:flex;justify-content:space-between}.toast{position:fixed;right:24px;bottom:24px;z-index:20;background:#11141b;border:1px solid rgba(255,36,56,.36);box-shadow:var(--shadow);border-radius:16px;padding:13px 16px;color:#fff;display:none}.toast.show{display:block;animation:pop .22s ease-out}@keyframes pop{from{transform:translateY(10px);opacity:0}to{transform:none;opacity:1}}
+    .meal-card{display:grid;grid-template-columns:1fr repeat(4,70px) auto;gap:10px;align-items:center;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);border-radius:14px;padding:12px;margin:8px 0}.meal-card b{display:block}.meal-card small{display:block;color:var(--muted);margin-top:4px}.macro{text-align:center}.macro b{color:#ffd4d8}.progress{height:8px;background:rgba(255,255,255,.08);border-radius:999px;overflow:hidden;margin-top:10px}.bar{height:100%;background:linear-gradient(90deg,var(--red2),var(--red));border-radius:999px}.mobile-menu{display:none}.theme-preview{height:9px;width:70px;border-radius:999px;background:linear-gradient(90deg,#050505,#111,#ff2438,#6e0a14)}
+    @media(max-width:1060px){.app{grid-template-columns:1fr}.sidebar{position:fixed;z-index:12;left:0;top:0;transform:translateX(-105%);transition:.2s}.sidebar.open{transform:none}.main{padding:18px}.mobile-menu{display:inline-flex}.kpis,.layout-2,.layout-3{grid-template-columns:1fr}.page-head{align-items:start;flex-direction:column}.meal-card{grid-template-columns:1fr 1fr 1fr}.topbar{height:auto;padding:12px;gap:10px;align-items:flex-start}.top-actions{flex-wrap:wrap}.login-grid{grid-template-columns:1fr}.btn{width:100%}}
   </style>
 </head>
 <body>
-  <main id="login" class="login-wrap">
-    <section class="login-card">
-      <div class="badge">🔐 Portal pessoal privado</div>
-      <h1>Entre para acessar seus dashboards</h1>
-      <p>Depois de entrar, você poderá controlar o financeiro, registrar dieta, importar planilhas e ver os gráficos atualizarem automaticamente.</p>
-      <div class="login-row">
-        <div style="flex:1;">
-          <label for="password">Senha</label>
-          <input id="password" type="password" placeholder="Digite sua senha" autocomplete="current-password" />
-        </div>
-        <div style="display:flex; align-items:end;">
-          <button id="loginBtn">Entrar</button>
+  <section id="login" class="login-wrap">
+    <div class="login-card">
+      <span class="badge">🔐 Portal pessoal protegido</span>
+      <h1>Entre para acessar seus dados</h1>
+      <p>Financeiro, dieta e treino em um único painel. Os dados ficam salvos no seu navegador e são protegidos pela senha informada.</p>
+      <div class="login-grid">
+        <div class="field"><label>Senha</label><input id="password" class="input" type="password" placeholder="Digite sua senha" autocomplete="current-password" /></div>
+        <button id="loginBtn" class="btn">Entrar</button>
+      </div>
+      <div id="loginError" class="error hidden">Senha incorreta. Tente novamente.</div>
+      <p class="hint">Observação: por ser GitHub Pages, esta proteção é adequada para uso pessoal, mas não substitui um login profissional com servidor.</p>
+    </div>
+  </section>
+
+  <section id="app" class="app hidden">
+    <aside id="sidebar" class="sidebar">
+      <div class="logo"><small>PORTAL PESSOAL</small><strong>ENZO</strong></div>
+      <div class="nav-section"><div class="nav-label">Visão geral</div><button class="nav-item active" data-view="home"><span class="nav-icon">▦</span> Dashboard geral</button></div>
+      <div class="nav-section">
+        <div class="nav-label">Financeiro <span>⌄</span></div>
+        <button class="nav-item group" data-group="financeiro" data-view="finance-dashboard"><span class="nav-icon">◉</span> Dashboard Financeiro</button>
+        <div id="group-financeiro" class="submenu open">
+          <button class="nav-item" data-view="finance-add">Adicionar lançamento</button>
+          <button class="nav-item" data-view="finance-list">Lançamentos</button>
+          <button class="nav-item" data-view="finance-goals">Metas e resumo</button>
+          <button class="nav-item" data-view="data-finance">Importar financeiro</button>
         </div>
       </div>
-      <div id="loginError" class="error"></div>
-      <div class="hint">Os dados ficam salvos apenas neste navegador, criptografados com a senha usada no acesso.</div>
-    </section>
-  </main>
-
-  <main id="app" class="app hidden">
-    <header class="topbar">
-      <div>
-        <div class="badge">⚡ Portal Pessoal Enzo</div>
-        <h1>Financeiro & Dieta</h1>
-        <p>Um painel único para acompanhar gastos, receitas, refeições, macros e evolução diária.</p>
-      </div>
-      <div class="actions">
-        <button id="saveNowBtn" class="secondary">Salvar agora</button>
-        <button id="exportBackupBtn" class="secondary">Exportar backup</button>
-        <button id="logoutBtn" class="danger">Sair</button>
-      </div>
-    </header>
-
-    <nav class="nav">
-      <button class="tab active" data-tab="visao">Visão geral</button>
-      <button class="tab" data-tab="financeiro">Dashboard financeiro</button>
-      <button class="tab" data-tab="lancamentos">Lançamentos</button>
-      <button class="tab" data-tab="dieta">Dashboard dieta</button>
-      <button class="tab" data-tab="refeicoes">Refeições</button>
-      <button class="tab" data-tab="importar">Importar/Backup</button>
-      <button class="tab" data-tab="ajuda">Como usar</button>
-    </nav>
-
-    <section id="visao" class="tab-panel">
-      <div class="grid kpi">
-        <div class="card kpi-card">
-          <div><div class="label">Resultado financeiro</div><div id="kpiVisaoResultado" class="value">R$ 0,00</div></div>
-          <div class="sub">Receitas - despesas - investimentos</div>
-        </div>
-        <div class="card kpi-card">
-          <div><div class="label">Saldo acumulado</div><div id="kpiVisaoSaldo" class="value">R$ 0,00</div></div>
-          <div class="sub">Soma dos resultados mensais</div>
-        </div>
-        <div class="card kpi-card">
-          <div><div class="label">Calorias hoje</div><div id="kpiVisaoCalorias" class="value">0 kcal</div></div>
-          <div class="sub">Baseado na data atual</div>
-        </div>
-        <div class="card kpi-card">
-          <div><div class="label">Proteína hoje</div><div id="kpiVisaoProteina" class="value">0 g</div></div>
-          <div class="sub">Soma das refeições do dia</div>
+      <div class="nav-section">
+        <div class="nav-label">Dieta <span>⌄</span></div>
+        <button class="nav-item group" data-group="dieta" data-view="diet-dashboard"><span class="nav-icon">▰</span> Dashboard Dieta</button>
+        <div id="group-dieta" class="submenu open">
+          <button class="nav-item" data-view="diet-add">Adicionar refeição</button>
+          <button class="nav-item" data-view="diet-list">Refeições</button>
+          <button class="nav-item" data-view="diet-measures">Água, peso e medidas</button>
+          <button class="nav-item" data-view="data-diet">Importar dieta</button>
         </div>
       </div>
-      <div class="grid two" style="margin-top:16px;">
-        <div class="card">
-          <div class="section-title">
-            <div><h2>Resumo financeiro mensal</h2><p>Entradas, saídas e resultado por mês.</p></div>
-          </div>
-          <div class="chartbox"><canvas id="visaoFinanceChart"></canvas></div>
-        </div>
-        <div class="card">
-          <div class="section-title">
-            <div><h2>Resumo de dieta</h2><p>Calorias e proteína dos últimos dias lançados.</p></div>
-          </div>
-          <div class="chartbox"><canvas id="visaoDietChart"></canvas></div>
+      <div class="nav-section">
+        <div class="nav-label">Treino <span>⌄</span></div>
+        <button class="nav-item group" data-group="treino" data-view="workout-dashboard"><span class="nav-icon">▱</span> Dashboard Treino</button>
+        <div id="group-treino" class="submenu open">
+          <button class="nav-item" data-view="workout-add">Adicionar treino</button>
+          <button class="nav-item" data-view="workout-list">Histórico de treinos</button>
+          <button class="nav-item" data-view="workout-progress">Evolução</button>
+          <button class="nav-item" data-view="data-workout">Importar treino</button>
         </div>
       </div>
-      <div class="grid two" style="margin-top:16px;">
-        <div class="card">
-          <h3>Próximos alertas financeiros</h3>
-          <div id="financeAlerts" class="mini-list"></div>
-        </div>
-        <div class="card">
-          <h3>Resumo de hoje</h3>
-          <div id="todayDietList" class="mini-list"></div>
-        </div>
+      <div class="nav-section"><div class="nav-label">Configurações</div><button class="nav-item" data-view="backup"><span class="nav-icon">▣</span> Backup e dados</button><button class="nav-item" data-view="settings"><span class="nav-icon">⚙</span> Preferências</button></div>
+      <button id="logout" class="btn ghost logout">Sair</button>
+    </aside>
+    <main class="main">
+      <div class="topbar">
+        <div style="display:flex;align-items:center;gap:12px"><button id="mobileMenu" class="mini-btn mobile-menu">☰</button><h2 id="topTitle">Dashboard geral</h2></div>
+        <div class="top-actions"><span class="pill"><span class="theme-preview"></span> Dark vermelho</span><span id="todayPill" class="pill"></span><button class="mini-btn" data-view="backup">Backup</button></div>
       </div>
-    </section>
+      <div id="view"></div>
+      <div class="footer"><span>“Disciplina hoje, liberdade amanhã.”</span><span>Portal Pessoal Enzo © 2026</span></div>
+    </main>
+  </section>
+  <div id="toast" class="toast"></div>
 
-    <section id="financeiro" class="tab-panel hidden">
-      <div class="toolbar">
-        <div class="field small-field"><label>Mês</label><select id="financeMonthFilter"><option value="TODOS">Todos</option></select></div>
-        <button id="addFinanceSampleBtn" class="secondary">Adicionar exemplos</button>
-      </div>
-      <div class="grid kpi">
-        <div class="card kpi-card">
-          <div><div class="label">Receitas</div><div id="kpiReceitas" class="value good">R$ 0,00</div></div>
-          <div class="sub">Total do filtro selecionado</div>
-        </div>
-        <div class="card kpi-card">
-          <div><div class="label">Despesas</div><div id="kpiDespesas" class="value bad">R$ 0,00</div></div>
-          <div class="sub">Gastos fixos e variáveis</div>
-        </div>
-        <div class="card kpi-card">
-          <div><div class="label">Investimentos</div><div id="kpiInvestimentos" class="value warn">R$ 0,00</div></div>
-          <div class="sub">Reserva, previdência e aplicações</div>
-        </div>
-        <div class="card kpi-card">
-          <div><div class="label">Resultado</div><div id="kpiResultado" class="value">R$ 0,00</div></div>
-          <div class="sub">Receitas - saídas</div>
-        </div>
-      </div>
-      <div class="grid two" style="margin-top:16px;">
-        <div class="card">
-          <div class="section-title">
-            <div><h2>Fluxo mensal</h2><p>Receitas, despesas, investimentos e resultado.</p></div>
-          </div>
-          <div class="chartbox"><canvas id="financeMonthlyChart"></canvas></div>
-        </div>
-        <div class="card">
-          <div class="section-title">
-            <div><h2>Composição das saídas</h2><p>Principais categorias de despesa e investimento.</p></div>
-          </div>
-          <div class="chartbox"><canvas id="financeCategoryChart"></canvas></div>
-        </div>
-      </div>
-      <div class="card" style="margin-top:16px;">
-        <div class="section-title">
-          <div><h2>Resumo por mês</h2><p>Tabela calculada automaticamente.</p></div>
-        </div>
-        <div class="table-wrap"><table id="financeMonthlyTable"></table></div>
-      </div>
-    </section>
-
-    <section id="lancamentos" class="tab-panel hidden">
-      <div class="card">
-        <div class="section-title">
-          <div><h2>Novo lançamento financeiro</h2><p>Inclua receitas, despesas e investimentos sem mexer no código.</p></div>
-        </div>
-        <div class="grid form">
-          <div><label>Data</label><input id="finData" type="date" /></div>
-          <div><label>Mês</label><select id="finMes"></select></div>
-          <div><label>Tipo</label><select id="finTipo"><option>Receita</option><option>Despesa</option><option>Investimento</option></select></div>
-          <div><label>Bloco</label><select id="finBloco"></select></div>
-          <div><label>Categoria</label><input id="finCategoria" placeholder="Ex.: Alimentação" /></div>
-          <div><label>Item</label><input id="finItem" placeholder="Ex.: Mercado" /></div>
-          <div><label>Valor</label><input id="finValor" type="number" step="0.01" placeholder="0.00" /></div>
-          <div><button id="addFinanceBtn">Adicionar lançamento</button></div>
-        </div>
-        <div style="margin-top:12px;"><label>Observações</label><input id="finObs" placeholder="Opcional" /></div>
-      </div>
-
-      <div class="card" style="margin-top:16px;">
-        <div class="section-title">
-          <div><h2>Editar lançamentos financeiros</h2><p>Altere os valores direto na tabela. O dashboard atualiza automaticamente.</p></div>
-        </div>
-        <div class="toolbar">
-          <div class="field small-field"><label>Mês</label><select id="financeTableMonth"><option value="TODOS">Todos</option></select></div>
-          <div class="field small-field"><label>Tipo</label><select id="financeTableType"><option value="TODOS">Todos</option><option>Receita</option><option>Despesa</option><option>Investimento</option></select></div>
-          <div class="field"><label>Buscar</label><input id="financeSearch" placeholder="Pesquisar categoria, item ou bloco..." /></div>
-        </div>
-        <div class="table-wrap"><table id="financeRecordsTable"></table></div>
-        <div id="financeTableStatus" class="status-line"></div>
-      </div>
-    </section>
-
-    <section id="dieta" class="tab-panel hidden">
-      <div class="toolbar">
-        <div class="field small-field"><label>Data</label><input id="dietDateFilter" type="date" /></div>
-        <button id="clearDietDateBtn" class="secondary">Ver tudo</button>
-        <button id="addDietSampleBtn" class="secondary">Adicionar exemplos</button>
-      </div>
-      <div class="grid kpi">
-        <div class="card kpi-card">
-          <div><div class="label">Calorias</div><div id="kpiCalories" class="value">0 kcal</div></div>
-          <div class="sub">Total do filtro selecionado</div>
-        </div>
-        <div class="card kpi-card">
-          <div><div class="label">Proteína</div><div id="kpiProtein" class="value good">0 g</div></div>
-          <div class="sub">Soma das refeições</div>
-        </div>
-        <div class="card kpi-card">
-          <div><div class="label">Carboidratos</div><div id="kpiCarbs" class="value">0 g</div></div>
-          <div class="sub">Soma dos alimentos</div>
-        </div>
-        <div class="card kpi-card">
-          <div><div class="label">Água</div><div id="kpiWater" class="value">0 L</div></div>
-          <div class="sub">Total informado no dia/filtro</div>
-        </div>
-      </div>
-      <div class="grid two" style="margin-top:16px;">
-        <div class="card">
-          <div class="section-title">
-            <div><h2>Calorias por dia</h2><p>Evolução baseada nas refeições lançadas.</p></div>
-          </div>
-          <div class="chartbox"><canvas id="dietCaloriesChart"></canvas></div>
-        </div>
-        <div class="card">
-          <div class="section-title">
-            <div><h2>Macros</h2><p>Proteína, carboidratos e gordura.</p></div>
-          </div>
-          <div class="chartbox"><canvas id="dietMacroChart"></canvas></div>
-        </div>
-      </div>
-      <div class="card" style="margin-top:16px;">
-        <div class="section-title">
-          <div><h2>Resumo por refeição</h2><p>Distribuição de calorias por café, almoço, jantar e lanches.</p></div>
-        </div>
-        <div class="table-wrap"><table id="mealSummaryTable"></table></div>
-      </div>
-    </section>
-
-    <section id="refeicoes" class="tab-panel hidden">
-      <div class="card">
-        <div class="section-title">
-          <div><h2>Nova refeição</h2><p>Cadastre cada alimento ou uma refeição completa.</p></div>
-        </div>
-        <div class="grid form">
-          <div><label>Data</label><input id="dietData" type="date" /></div>
-          <div><label>Refeição</label><select id="dietMeal"></select></div>
-          <div><label>Alimento</label><input id="dietFood" placeholder="Ex.: Frango" /></div>
-          <div><label>Quantidade</label><input id="dietQty" placeholder="Ex.: 150g" /></div>
-          <div><label>Calorias</label><input id="dietCalories" type="number" step="1" placeholder="0" /></div>
-          <div><label>Proteína (g)</label><input id="dietProtein" type="number" step="0.1" placeholder="0" /></div>
-          <div><label>Carbo (g)</label><input id="dietCarbs" type="number" step="0.1" placeholder="0" /></div>
-          <div><label>Gordura (g)</label><input id="dietFat" type="number" step="0.1" placeholder="0" /></div>
-          <div><label>Água (ml)</label><input id="dietWater" type="number" step="50" placeholder="0" /></div>
-          <div style="grid-column: span 2;"><label>Observações</label><input id="dietObs" placeholder="Opcional" /></div>
-          <div><button id="addDietBtn">Adicionar refeição</button></div>
-        </div>
-      </div>
-      <div class="card" style="margin-top:16px;">
-        <div class="section-title">
-          <div><h2>Editar refeições</h2><p>Edite direto na tabela. Os gráficos são recalculados na hora.</p></div>
-        </div>
-        <div class="toolbar">
-          <div class="field small-field"><label>Data</label><input id="dietTableDate" type="date" /></div>
-          <div class="field small-field"><label>Refeição</label><select id="dietTableMeal"><option value="TODOS">Todas</option></select></div>
-          <div class="field"><label>Buscar</label><input id="dietSearch" placeholder="Pesquisar alimento, quantidade ou observação..." /></div>
-        </div>
-        <div class="table-wrap"><table id="dietRecordsTable"></table></div>
-        <div id="dietTableStatus" class="status-line"></div>
-      </div>
-    </section>
-
-    <section id="importar" class="tab-panel hidden">
-      <div class="notice">
-        <strong>Atenção:</strong> importar planilhas pelo site salva os dados só no navegador usado agora. Para levar para outro computador, use “Exportar backup” e depois “Importar backup”.
-      </div>
-      <div class="grid two">
-        <div class="card">
-          <h2>Importar financeiro</h2>
-          <p>Use a planilha modelo ou um CSV com colunas parecidas.</p>
-          <div class="template-links">
-            <a class="buttonlike secondary" href="modelo_lancamentos_financeiros.xlsx" download>Baixar modelo XLSX</a>
-            <a class="buttonlike secondary" href="modelo_lancamentos_financeiros.csv" download>Baixar modelo CSV</a>
-          </div>
-          <div class="divider"></div>
-          <div class="filebox">
-            <label>Arquivo financeiro .xlsx ou .csv</label>
-            <input id="financeImportFile" type="file" accept=".xlsx,.csv" />
-            <div class="toolbar" style="margin-top:12px;margin-bottom:0;">
-              <button id="importFinanceReplaceBtn">Substituir financeiro</button>
-              <button id="importFinanceAppendBtn" class="secondary">Adicionar ao financeiro</button>
-            </div>
-          </div>
-        </div>
-        <div class="card">
-          <h2>Importar dieta</h2>
-          <p>Use o modelo de refeições para controlar calorias, macros e água.</p>
-          <div class="template-links">
-            <a class="buttonlike secondary" href="modelo_refeicoes_dieta.xlsx" download>Baixar modelo XLSX</a>
-            <a class="buttonlike secondary" href="modelo_refeicoes_dieta.csv" download>Baixar modelo CSV</a>
-          </div>
-          <div class="divider"></div>
-          <div class="filebox">
-            <label>Arquivo de dieta .xlsx ou .csv</label>
-            <input id="dietImportFile" type="file" accept=".xlsx,.csv" />
-            <div class="toolbar" style="margin-top:12px;margin-bottom:0;">
-              <button id="importDietReplaceBtn">Substituir dieta</button>
-              <button id="importDietAppendBtn" class="secondary">Adicionar à dieta</button>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="grid two" style="margin-top:16px;">
-        <div class="card">
-          <h2>Backup completo</h2>
-          <p>Exporte ou importe um arquivo JSON com financeiro e dieta juntos.</p>
-          <div class="toolbar" style="margin-top:12px;">
-            <button id="exportJsonBtn">Exportar backup JSON</button>
-            <button id="importJsonBtn" class="secondary">Importar backup JSON</button>
-            <input id="jsonImportFile" class="hidden" type="file" accept=".json" />
-          </div>
-        </div>
-        <div class="card">
-          <h2>Área de risco</h2>
-          <p>Apague os dados salvos neste navegador.</p>
-          <div class="toolbar" style="margin-top:12px;">
-            <button id="clearFinanceBtn" class="danger">Limpar financeiro</button>
-            <button id="clearDietBtn" class="danger">Limpar dieta</button>
-            <button id="clearAllBtn" class="danger">Limpar tudo</button>
-          </div>
-        </div>
-      </div>
-      <div id="importStatus" class="status-line"></div>
-    </section>
-
-    <section id="ajuda" class="tab-panel hidden">
-      <div class="grid two">
-        <div class="card">
-          <h2>Como atualizar seus dados</h2>
-          <p>O jeito mais fácil é usar as abas <strong>Lançamentos</strong> e <strong>Refeições</strong>. Você edita na tabela, salva e o dashboard recalcula sozinho.</p>
-          <div class="divider"></div>
-          <div class="mini-list">
-            <div class="mini-row"><strong>Financeiro</strong><span>Receitas, despesas, investimentos e categorias</span></div>
-            <div class="mini-row"><strong>Dieta</strong><span>Refeições, calorias, macros e água</span></div>
-            <div class="mini-row"><strong>Importar</strong><span>Substituir ou somar dados por planilha</span></div>
-            <div class="mini-row"><strong>Backup</strong><span>Levar dados para outro navegador/computador</span></div>
-          </div>
-        </div>
-        <div class="card">
-          <h2>Formato das planilhas</h2>
-          <p>Use os modelos que deixei na aba Importar. Para valores, use número puro, sem <code>R$</code>. Para centavos, use ponto ou vírgula.</p>
-          <div class="divider"></div>
-          <p><strong>Financeiro:</strong> Data, Mês, Tipo, Bloco, Categoria, Item, Valor, Observações.</p>
-          <p><strong>Dieta:</strong> Data, Refeição, Alimento, Quantidade, Calorias, Proteína, Carboidrato, Gordura, Água ml, Observações.</p>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <script>
-    const PASSWORD_HASH = "372ead080f3fb91706fa98dd8f779081f8189edd5a838b285cc968c025128187";
-    const STORAGE_KEY = "portalPessoalEnzoEncryptedV1";
-    const SALT_TEXT = "portal-pessoal-enzo-financeiro-dieta-v1";
-    const MONTHS = ["JAN","FEV","MAR","ABRIL","MAIO","JUN","JUL","AGO","SET","OUT","NOV","DEZ"];
-    const FIN_TYPES = ["Receita", "Despesa", "Investimento"];
-    const FIN_BLOCKS = ["Receitas", "Despesas Fixas", "Despesas Variáveis", "Despesas Extras", "Investimentos / Previdência / Reserva"];
-    const MEALS = ["Café da manhã", "Almoço", "Lanche", "Pré-treino", "Pós-treino", "Jantar", "Ceia", "Outro"];
-
-    let state = { finance: [], diet: [] };
-    let cryptoKey = null;
-    let charts = {};
-    const $ = (id) => document.getElementById(id);
-    const enc = new TextEncoder();
-    const dec = new TextDecoder();
-
-    const todayISO = () => new Date().toISOString().slice(0,10);
-    const uid = () => (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2));
-    const stripAccents = (s) => String(s ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
-    const norm = (s) => stripAccents(s).toLowerCase();
-    const money = (value) => Number(value || 0).toLocaleString("pt-BR", {style:"currency", currency:"BRL"});
-    const num = (value, digits=0) => Number(value || 0).toLocaleString("pt-BR", {maximumFractionDigits:digits, minimumFractionDigits:digits});
-    const escapeHtml = (s) => String(s ?? "").replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
-
-    async function sha256Hex(text) {
-      const hash = await crypto.subtle.digest("SHA-256", enc.encode(text));
-      return [...new Uint8Array(hash)].map(b => b.toString(16).padStart(2, "0")).join("");
-    }
-    async function deriveKey(password) {
-      const material = await crypto.subtle.importKey("raw", enc.encode(password), "PBKDF2", false, ["deriveKey"]);
-      return crypto.subtle.deriveKey(
-        { name: "PBKDF2", salt: enc.encode(SALT_TEXT), iterations: 250000, hash: "SHA-256" },
-        material,
-        { name: "AES-GCM", length: 256 },
-        false,
-        ["encrypt", "decrypt"]
-      );
-    }
-    function b64(bytes) { return btoa(String.fromCharCode(...new Uint8Array(bytes))); }
-    function fromB64(str) { return Uint8Array.from(atob(str), c => c.charCodeAt(0)); }
-
-    async function saveEncrypted() {
-      if (!cryptoKey) return;
-      const iv = crypto.getRandomValues(new Uint8Array(12));
-      const plaintext = enc.encode(JSON.stringify(state));
-      const ciphertext = await crypto.subtle.encrypt({ name: "AES-GCM", iv }, cryptoKey, plaintext);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ iv: b64(iv), data: b64(ciphertext), updatedAt: new Date().toISOString() }));
-    }
-    async function loadEncrypted() {
-      const payload = localStorage.getItem(STORAGE_KEY);
-      if (!payload) return { finance: [], diet: [] };
-      const parsed = JSON.parse(payload);
-      const decrypted = await crypto.subtle.decrypt({ name: "AES-GCM", iv: fromB64(parsed.iv) }, cryptoKey, fromB64(parsed.data));
-      const loaded = JSON.parse(dec.decode(decrypted));
-      return {
-        finance: Array.isArray(loaded.finance) ? loaded.finance.map(ensureFinance) : [],
-        diet: Array.isArray(loaded.diet) ? loaded.diet.map(ensureDiet) : []
-      };
-    }
-
-    function parseMoney(v) {
-      if (typeof v === "number") return Number.isFinite(v) ? v : 0;
-      let s = String(v ?? "").trim();
-      if (!s) return 0;
-      s = s.replace(/[R$\s]/g, "");
-      if (s.includes(",") && s.includes(".")) s = s.replace(/\./g, "").replace(",", ".");
-      else if (s.includes(",")) s = s.replace(",", ".");
-      const n = parseFloat(s);
-      return Number.isFinite(n) ? n : 0;
-    }
-    function parseDate(v) {
-      if (!v) return "";
-      if (v instanceof Date && !isNaN(v)) return v.toISOString().slice(0,10);
-      if (typeof v === "number") {
-        const d = new Date(Math.round((v - 25569) * 86400 * 1000));
-        return isNaN(d) ? "" : d.toISOString().slice(0,10);
-      }
-      const s = String(v).trim();
-      if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
-      const m = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/);
-      if (m) {
-        const yyyy = m[3].length === 2 ? "20" + m[3] : m[3];
-        return `${yyyy}-${m[2].padStart(2,"0")}-${m[1].padStart(2,"0")}`;
-      }
-      return "";
-    }
-    function monthFromDate(date) {
-      const d = parseDate(date);
-      if (!d) return "";
-      const monthIndex = Number(d.slice(5,7)) - 1;
-      return MONTHS[monthIndex] || "";
-    }
-    function normalizeMonth(v, fallbackDate="") {
-      if (!v) return monthFromDate(fallbackDate) || MONTHS[new Date().getMonth()];
-      const raw = stripAccents(v).replace("ç", "c");
-      const map = {
-        "janeiro":"JAN","jan":"JAN","1":"JAN","01":"JAN",
-        "fevereiro":"FEV","fev":"FEV","2":"FEV","02":"FEV",
-        "marco":"MAR","março":"MAR","mar":"MAR","3":"MAR","03":"MAR",
-        "abril":"ABRIL","abr":"ABRIL","4":"ABRIL","04":"ABRIL",
-        "maio":"MAIO","mai":"MAIO","5":"MAIO","05":"MAIO",
-        "junho":"JUN","jun":"JUN","6":"JUN","06":"JUN",
-        "julho":"JUL","jul":"JUL","7":"JUL","07":"JUL",
-        "agosto":"AGO","ago":"AGO","8":"AGO","08":"AGO",
-        "setembro":"SET","set":"SET","9":"SET","09":"SET",
-        "outubro":"OUT","out":"OUT","10":"OUT",
-        "novembro":"NOV","nov":"NOV","11":"NOV",
-        "dezembro":"DEZ","dez":"DEZ","12":"DEZ"
-      };
-      const key = raw.toLowerCase();
-      const upper = raw.toUpperCase();
-      return MONTHS.includes(upper) ? upper : (map[key] || monthFromDate(fallbackDate) || MONTHS[new Date().getMonth()]);
-    }
-    function normalizeFinType(v) {
-      const s = norm(v);
-      if (s.includes("invest")) return "Investimento";
-      if (s.includes("receita") || s.includes("entrada") || s.includes("salario") || s.includes("renda")) return "Receita";
-      return "Despesa";
-    }
-    function normalizeMeal(v) {
-      const s = norm(v);
-      if (!s) return "Outro";
-      if (s.includes("cafe")) return "Café da manhã";
-      if (s.includes("almoco")) return "Almoço";
-      if (s.includes("pre")) return "Pré-treino";
-      if (s.includes("pos")) return "Pós-treino";
-      if (s.includes("jantar")) return "Jantar";
-      if (s.includes("ceia")) return "Ceia";
-      if (s.includes("lanche")) return "Lanche";
-      return MEALS.includes(v) ? v : "Outro";
-    }
-    function findField(row, names) {
-      const keys = Object.keys(row || {});
-      for (const wanted of names) {
-        const w = norm(wanted);
-        const found = keys.find(k => norm(k) === w || norm(k).includes(w));
-        if (found) return row[found];
-      }
-      return "";
-    }
-    function ensureFinance(r) {
-      const data = parseDate(r.data ?? r.Data ?? findField(r, ["Data"]));
-      const tipo = normalizeFinType(r.tipo ?? r.Tipo ?? findField(r, ["Tipo"]));
-      return {
-        id: r.id || uid(),
-        data,
-        mes: normalizeMonth(r.mes ?? r.Mês ?? r.Mes ?? findField(r, ["Mês","Mes"]), data),
-        tipo,
-        bloco: r.bloco || r.Bloco || findField(r, ["Bloco"]) || (tipo === "Receita" ? "Receitas" : tipo === "Investimento" ? "Investimentos / Previdência / Reserva" : "Despesas Variáveis"),
-        categoria: r.categoria || r.Categoria || findField(r, ["Categoria"]) || "Sem categoria",
-        item: r.item || r.Item || findField(r, ["Item","Descrição","Descricao"]) || "Sem descrição",
-        valor: Math.abs(parseMoney(r.valor ?? r.Valor ?? findField(r, ["Valor"]))),
-        observacoes: r.observacoes || r.Observações || r.Observacoes || findField(r, ["Observações","Observacoes"]) || ""
-      };
-    }
-    function ensureDiet(r) {
-      const data = parseDate(r.data ?? r.Data ?? findField(r, ["Data"])) || todayISO();
-      return {
-        id: r.id || uid(),
-        data,
-        refeicao: normalizeMeal(r.refeicao ?? r.Refeição ?? r.Refeicao ?? findField(r, ["Refeição","Refeicao"])),
-        alimento: r.alimento || r.Alimento || findField(r, ["Alimento"]) || "Sem alimento",
-        quantidade: r.quantidade || r.Quantidade || findField(r, ["Quantidade"]) || "",
-        calorias: Math.max(0, parseMoney(r.calorias ?? r.Calorias ?? findField(r, ["Calorias","Kcal"]))),
-        proteina: Math.max(0, parseMoney(r.proteina ?? r.Proteína ?? r.Proteina ?? findField(r, ["Proteína","Proteina"]))),
-        carboidrato: Math.max(0, parseMoney(r.carboidrato ?? r.Carboidrato ?? r.Carbo ?? findField(r, ["Carboidrato","Carbo"]))),
-        gordura: Math.max(0, parseMoney(r.gordura ?? r.Gordura ?? findField(r, ["Gordura"]))),
-        aguaMl: Math.max(0, parseMoney(r.aguaMl ?? r["Água ml"] ?? r["Agua ml"] ?? r.Agua ?? r.Água ?? findField(r, ["Água ml","Agua ml","Água","Agua"]))),
-        observacoes: r.observacoes || r.Observações || r.Observacoes || findField(r, ["Observações","Observacoes"]) || ""
-      };
-    }
-    function sum(arr, fn) { return arr.reduce((a, r) => a + Number(fn(r) || 0), 0); }
-    function byMonthFinance() {
-      return MONTHS.map(mes => {
-        const rows = state.finance.filter(r => r.mes === mes);
-        const receitas = sum(rows.filter(r => r.tipo === "Receita"), r => r.valor);
-        const despesas = sum(rows.filter(r => r.tipo === "Despesa"), r => r.valor);
-        const investimentos = sum(rows.filter(r => r.tipo === "Investimento"), r => r.valor);
-        return { mes, receitas, despesas, investimentos, resultado: receitas - despesas - investimentos };
-      });
-    }
-    function financeRowsFiltered(forTable=false) {
-      const month = forTable ? $("financeTableMonth").value : $("financeMonthFilter").value;
-      const type = forTable ? $("financeTableType").value : "TODOS";
-      const q = forTable ? norm($("financeSearch").value) : "";
-      return state.finance.filter(r => {
-        if (month && month !== "TODOS" && r.mes !== month) return false;
-        if (type && type !== "TODOS" && r.tipo !== type) return false;
-        if (q && !norm(`${r.bloco} ${r.categoria} ${r.item} ${r.observacoes}`).includes(q)) return false;
-        return true;
-      });
-    }
-    function dietRowsFiltered(forTable=false) {
-      const date = forTable ? $("dietTableDate").value : $("dietDateFilter").value;
-      const meal = forTable ? $("dietTableMeal").value : "TODOS";
-      const q = forTable ? norm($("dietSearch").value) : "";
-      return state.diet.filter(r => {
-        if (date && r.data !== date) return false;
-        if (meal && meal !== "TODOS" && r.refeicao !== meal) return false;
-        if (q && !norm(`${r.refeicao} ${r.alimento} ${r.quantidade} ${r.observacoes}`).includes(q)) return false;
-        return true;
-      });
-    }
-    function groupByDateDiet() {
-      const map = {};
-      for (const r of state.diet) {
-        if (!map[r.data]) map[r.data] = { data: r.data, calorias: 0, proteina: 0, carboidrato: 0, gordura: 0, aguaMl: 0 };
-        map[r.data].calorias += Number(r.calorias || 0);
-        map[r.data].proteina += Number(r.proteina || 0);
-        map[r.data].carboidrato += Number(r.carboidrato || 0);
-        map[r.data].gordura += Number(r.gordura || 0);
-        map[r.data].aguaMl += Number(r.aguaMl || 0);
-      }
-      return Object.values(map).sort((a,b) => a.data.localeCompare(b.data));
-    }
-
-    function chartDefaults() {
-      if (!window.Chart) return;
-      Chart.defaults.color = "#94a3b8";
-      Chart.defaults.borderColor = "rgba(148, 163, 184, .16)";
-      Chart.defaults.font.family = 'Inter, system-ui, -apple-system, "Segoe UI", sans-serif';
-    }
-    function upsertChart(id, type, data, options={}) {
-      if (!window.Chart) return;
-      const ctx = $(id);
-      if (!ctx) return;
-      if (charts[id]) charts[id].destroy();
-      charts[id] = new Chart(ctx, {
-        type,
-        data,
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: { legend: { position: "bottom" }, tooltip: { mode: "index", intersect: false }, ...(options.plugins || {}) },
-          scales: type === "doughnut" || type === "pie" ? undefined : {
-            x: { grid: { color: "rgba(148, 163, 184, .08)" } },
-            y: { beginAtZero: true, grid: { color: "rgba(148, 163, 184, .08)" } }
-          },
-          ...options
-        }
-      });
-    }
-    function renderAll() {
-      fillSelects();
-      renderVisao();
-      renderFinanceDashboard();
-      renderFinanceTable();
-      renderDietDashboard();
-      renderDietTable();
-    }
-    function fillSelects() {
-      const monthOptions = '<option value="TODOS">Todos</option>' + MONTHS.map(m => `<option>${m}</option>`).join("");
-      ["financeMonthFilter","financeTableMonth"].forEach(id => { const el=$(id); if (el && !el.dataset.done) { el.innerHTML=monthOptions; el.dataset.done="1"; } });
-      const monthOnly = MONTHS.map(m => `<option>${m}</option>`).join("");
-      const finMes = $("finMes"); if (finMes && !finMes.dataset.done) { finMes.innerHTML = monthOnly; finMes.value = monthFromDate(todayISO()); finMes.dataset.done="1"; }
-      const blocos = FIN_BLOCKS.map(b => `<option>${escapeHtml(b)}</option>`).join("");
-      const finBloco = $("finBloco"); if (finBloco && !finBloco.dataset.done) { finBloco.innerHTML = blocos; finBloco.dataset.done="1"; }
-      const mealOptions = MEALS.map(m => `<option>${escapeHtml(m)}</option>`).join("");
-      const mealFilterOptions = '<option value="TODOS">Todas</option>' + mealOptions;
-      const dietMeal = $("dietMeal"); if (dietMeal && !dietMeal.dataset.done) { dietMeal.innerHTML=mealOptions; dietMeal.dataset.done="1"; }
-      const dietTableMeal = $("dietTableMeal"); if (dietTableMeal && !dietTableMeal.dataset.done) { dietTableMeal.innerHTML=mealFilterOptions; dietTableMeal.dataset.done="1"; }
-      const today = todayISO();
-      ["finData","dietData"].forEach(id => { const el=$(id); if (el && !el.value) el.value=today; });
-      const df = $("dietDateFilter"); if (df && !df.dataset.done) { df.value=today; df.dataset.done="1"; }
-    }
-    function renderVisao() {
-      const monthly = byMonthFinance();
-      const receitas = sum(state.finance.filter(r => r.tipo === "Receita"), r => r.valor);
-      const despesas = sum(state.finance.filter(r => r.tipo === "Despesa"), r => r.valor);
-      const inv = sum(state.finance.filter(r => r.tipo === "Investimento"), r => r.valor);
-      const resultado = receitas - despesas - inv;
-      $("kpiVisaoResultado").textContent = money(resultado);
-      $("kpiVisaoResultado").className = "value " + (resultado >= 0 ? "good" : "bad");
-      $("kpiVisaoSaldo").textContent = money(sum(monthly, r => r.resultado));
-      const todayRows = state.diet.filter(r => r.data === todayISO());
-      $("kpiVisaoCalorias").textContent = `${num(sum(todayRows, r => r.calorias))} kcal`;
-      $("kpiVisaoProteina").textContent = `${num(sum(todayRows, r => r.proteina), 1)} g`;
-
-      upsertChart("visaoFinanceChart", "bar", {
-        labels: MONTHS,
-        datasets: [
-          { label: "Receitas", data: monthly.map(r => r.receitas), backgroundColor: "rgba(34, 197, 94, .55)" },
-          { label: "Saídas", data: monthly.map(r => r.despesas + r.investimentos), backgroundColor: "rgba(251, 113, 133, .55)" },
-          { label: "Resultado", data: monthly.map(r => r.resultado), type: "line", borderColor: "#22d3ee", backgroundColor: "rgba(34,211,238,.20)", tension: .35 }
-        ]
-      });
-      const days = groupByDateDiet().slice(-10);
-      upsertChart("visaoDietChart", "line", {
-        labels: days.map(d => d.data.split("-").reverse().join("/")),
-        datasets: [
-          { label: "Calorias", data: days.map(d => d.calorias), borderColor: "#8b5cf6", backgroundColor: "rgba(139,92,246,.18)", tension: .35 },
-          { label: "Proteína (g)", data: days.map(d => d.proteina), borderColor: "#22d3ee", backgroundColor: "rgba(34,211,238,.16)", tension: .35 }
-        ]
-      });
-      const neg = monthly.filter(r => r.resultado < 0);
-      $("financeAlerts").innerHTML = neg.length ? neg.map(r => `<div class="mini-row"><strong>${r.mes}</strong><span class="pill bad">${money(r.resultado)}</span></div>`).join("") : `<div class="empty">Nenhum mês negativo lançado até agora.</div>`;
-      $("todayDietList").innerHTML = todayRows.length ? [
-        ["Calorias", `${num(sum(todayRows, r => r.calorias))} kcal`],
-        ["Proteína", `${num(sum(todayRows, r => r.proteina),1)} g`],
-        ["Carboidratos", `${num(sum(todayRows, r => r.carboidrato),1)} g`],
-        ["Água", `${num(sum(todayRows, r => r.aguaMl)/1000,2)} L`],
-      ].map(([a,b]) => `<div class="mini-row"><strong>${a}</strong><span>${b}</span></div>`).join("") : `<div class="empty">Nenhuma refeição lançada para hoje.</div>`;
-    }
-    function renderFinanceDashboard() {
-      const rows = financeRowsFiltered(false);
-      const receitas = sum(rows.filter(r => r.tipo === "Receita"), r => r.valor);
-      const despesas = sum(rows.filter(r => r.tipo === "Despesa"), r => r.valor);
-      const investimentos = sum(rows.filter(r => r.tipo === "Investimento"), r => r.valor);
-      const resultado = receitas - despesas - investimentos;
-      $("kpiReceitas").textContent = money(receitas);
-      $("kpiDespesas").textContent = money(despesas);
-      $("kpiInvestimentos").textContent = money(investimentos);
-      $("kpiResultado").textContent = money(resultado);
-      $("kpiResultado").className = "value " + (resultado >= 0 ? "good" : "bad");
-
-      const monthly = byMonthFinance();
-      upsertChart("financeMonthlyChart", "bar", {
-        labels: MONTHS,
-        datasets: [
-          { label: "Receitas", data: monthly.map(r => r.receitas), backgroundColor: "rgba(34,197,94,.58)" },
-          { label: "Despesas", data: monthly.map(r => r.despesas), backgroundColor: "rgba(251,113,133,.58)" },
-          { label: "Investimentos", data: monthly.map(r => r.investimentos), backgroundColor: "rgba(245,158,11,.58)" },
-          { label: "Resultado", data: monthly.map(r => r.resultado), type: "line", borderColor: "#22d3ee", backgroundColor: "rgba(34,211,238,.20)", tension:.35 }
-        ]
-      });
-      const catMap = {};
-      rows.filter(r => r.tipo !== "Receita").forEach(r => catMap[r.categoria] = (catMap[r.categoria] || 0) + r.valor);
-      const cats = Object.entries(catMap).sort((a,b)=>b[1]-a[1]).slice(0,8);
-      upsertChart("financeCategoryChart", "doughnut", {
-        labels: cats.map(c => c[0]),
-        datasets: [{ label: "Saídas", data: cats.map(c => c[1]), backgroundColor: ["#22d3ee","#8b5cf6","#fb7185","#f59e0b","#22c55e","#60a5fa","#f472b6","#a78bfa"] }]
-      }, { cutout: "62%" });
-
-      $("financeMonthlyTable").innerHTML = `<thead><tr><th>Mês</th><th>Receitas</th><th>Despesas</th><th>Investimentos</th><th>Resultado</th></tr></thead><tbody>` +
-        monthly.map(r => `<tr><td><span class="pill">${r.mes}</span></td><td>${money(r.receitas)}</td><td>${money(r.despesas)}</td><td>${money(r.investimentos)}</td><td><span class="pill ${r.resultado >= 0 ? "good":"bad"}">${money(r.resultado)}</span></td></tr>`).join("") + `</tbody>`;
-    }
-    function renderFinanceTable() {
-      const rows = financeRowsFiltered(true);
-      $("financeRecordsTable").innerHTML = `<thead><tr><th>Data</th><th>Mês</th><th>Tipo</th><th>Bloco</th><th>Categoria</th><th>Item</th><th>Valor</th><th>Observações</th><th>Ações</th></tr></thead><tbody>` +
-        rows.map(r => `<tr data-id="${r.id}">
-          <td><input type="date" data-fin="data" value="${escapeHtml(r.data)}"></td>
-          <td><select data-fin="mes">${MONTHS.map(m => `<option ${m===r.mes?"selected":""}>${m}</option>`).join("")}</select></td>
-          <td><select data-fin="tipo">${FIN_TYPES.map(t => `<option ${t===r.tipo?"selected":""}>${t}</option>`).join("")}</select></td>
-          <td><select data-fin="bloco">${FIN_BLOCKS.map(b => `<option ${b===r.bloco?"selected":""}>${escapeHtml(b)}</option>`).join("")}</select></td>
-          <td><input data-fin="categoria" value="${escapeHtml(r.categoria)}"></td>
-          <td><input data-fin="item" value="${escapeHtml(r.item)}"></td>
-          <td><input class="money-input" type="number" step="0.01" data-fin="valor" value="${Number(r.valor || 0)}"></td>
-          <td><input data-fin="observacoes" value="${escapeHtml(r.observacoes)}"></td>
-          <td><button class="small secondary" data-action="dup-fin">Duplicar</button> <button class="small danger" data-action="del-fin">Excluir</button></td>
-        </tr>`).join("") + `</tbody>`;
-      $("financeTableStatus").textContent = `${rows.length} lançamento(s) exibido(s) de ${state.finance.length}.`;
-    }
-    function renderDietDashboard() {
-      const rows = dietRowsFiltered(false);
-      $("kpiCalories").textContent = `${num(sum(rows, r => r.calorias))} kcal`;
-      $("kpiProtein").textContent = `${num(sum(rows, r => r.proteina), 1)} g`;
-      $("kpiCarbs").textContent = `${num(sum(rows, r => r.carboidrato), 1)} g`;
-      $("kpiWater").textContent = `${num(sum(rows, r => r.aguaMl) / 1000, 2)} L`;
-
-      const days = groupByDateDiet();
-      upsertChart("dietCaloriesChart", "bar", {
-        labels: days.map(d => d.data.split("-").reverse().join("/")),
-        datasets: [
-          { label: "Calorias", data: days.map(d => d.calorias), backgroundColor: "rgba(139,92,246,.58)" },
-          { label: "Proteína (g)", data: days.map(d => d.proteina), type: "line", borderColor: "#22d3ee", backgroundColor: "rgba(34,211,238,.16)", tension: .35 }
-        ]
-      });
-      const macros = [sum(rows, r => r.proteina), sum(rows, r => r.carboidrato), sum(rows, r => r.gordura)];
-      upsertChart("dietMacroChart", "doughnut", {
-        labels: ["Proteína", "Carboidrato", "Gordura"],
-        datasets: [{ label: "Macros", data: macros, backgroundColor: ["#22d3ee","#8b5cf6","#f59e0b"] }]
-      }, { cutout: "62%" });
-
-      const mealMap = {};
-      for (const r of rows) {
-        if (!mealMap[r.refeicao]) mealMap[r.refeicao] = { calorias:0, proteina:0, carboidrato:0, gordura:0, aguaMl:0 };
-        mealMap[r.refeicao].calorias += Number(r.calorias || 0);
-        mealMap[r.refeicao].proteina += Number(r.proteina || 0);
-        mealMap[r.refeicao].carboidrato += Number(r.carboidrato || 0);
-        mealMap[r.refeicao].gordura += Number(r.gordura || 0);
-        mealMap[r.refeicao].aguaMl += Number(r.aguaMl || 0);
-      }
-      const mealRows = Object.entries(mealMap).sort((a,b) => b[1].calorias - a[1].calorias);
-      $("mealSummaryTable").innerHTML = `<thead><tr><th>Refeição</th><th>Calorias</th><th>Proteína</th><th>Carbo</th><th>Gordura</th><th>Água</th></tr></thead><tbody>` +
-        mealRows.map(([meal, v]) => `<tr><td><span class="pill">${escapeHtml(meal)}</span></td><td>${num(v.calorias)} kcal</td><td>${num(v.proteina,1)} g</td><td>${num(v.carboidrato,1)} g</td><td>${num(v.gordura,1)} g</td><td>${num(v.aguaMl/1000,2)} L</td></tr>`).join("") + `</tbody>`;
-    }
-    function renderDietTable() {
-      const rows = dietRowsFiltered(true);
-      $("dietRecordsTable").innerHTML = `<thead><tr><th>Data</th><th>Refeição</th><th>Alimento</th><th>Qtd.</th><th>Calorias</th><th>Proteína</th><th>Carbo</th><th>Gordura</th><th>Água ml</th><th>Obs.</th><th>Ações</th></tr></thead><tbody>` +
-        rows.map(r => `<tr data-id="${r.id}">
-          <td><input type="date" data-diet="data" value="${escapeHtml(r.data)}"></td>
-          <td><select data-diet="refeicao">${MEALS.map(m => `<option ${m===r.refeicao?"selected":""}>${escapeHtml(m)}</option>`).join("")}</select></td>
-          <td><input data-diet="alimento" value="${escapeHtml(r.alimento)}"></td>
-          <td><input data-diet="quantidade" value="${escapeHtml(r.quantidade)}"></td>
-          <td><input class="num-input" type="number" step="1" data-diet="calorias" value="${Number(r.calorias || 0)}"></td>
-          <td><input class="num-input" type="number" step="0.1" data-diet="proteina" value="${Number(r.proteina || 0)}"></td>
-          <td><input class="num-input" type="number" step="0.1" data-diet="carboidrato" value="${Number(r.carboidrato || 0)}"></td>
-          <td><input class="num-input" type="number" step="0.1" data-diet="gordura" value="${Number(r.gordura || 0)}"></td>
-          <td><input class="num-input" type="number" step="50" data-diet="aguaMl" value="${Number(r.aguaMl || 0)}"></td>
-          <td><input data-diet="observacoes" value="${escapeHtml(r.observacoes)}"></td>
-          <td><button class="small secondary" data-action="dup-diet">Duplicar</button> <button class="small danger" data-action="del-diet">Excluir</button></td>
-        </tr>`).join("") + `</tbody>`;
-      $("dietTableStatus").textContent = `${rows.length} refeição(ões) exibida(s) de ${state.diet.length}.`;
-    }
-
-    function switchTab(tab) {
-      document.querySelectorAll(".tab").forEach(btn => btn.classList.toggle("active", btn.dataset.tab === tab));
-      document.querySelectorAll(".tab-panel").forEach(panel => panel.classList.toggle("hidden", panel.id !== tab));
-      setTimeout(renderAll, 40);
-    }
-    async function saveAndRender() {
-      await saveEncrypted();
-      renderAll();
-    }
-    function download(filename, text, type="application/json") {
-      const blob = new Blob([text], { type });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url; a.download = filename; a.click();
-      URL.revokeObjectURL(url);
-    }
-    function stateToCsv(kind) {
-      const rows = kind === "finance" ? state.finance : state.diet;
-      const headers = kind === "finance" ? ["Data","Mês","Tipo","Bloco","Categoria","Item","Valor","Observações"] : ["Data","Refeição","Alimento","Quantidade","Calorias","Proteína","Carboidrato","Gordura","Água ml","Observações"];
-      const lines = [headers.join(";")];
-      for (const r of rows) {
-        const vals = kind === "finance" ? [r.data,r.mes,r.tipo,r.bloco,r.categoria,r.item,r.valor,r.observacoes] : [r.data,r.refeicao,r.alimento,r.quantidade,r.calorias,r.proteina,r.carboidrato,r.gordura,r.aguaMl,r.observacoes];
-        lines.push(vals.map(v => `"${String(v ?? "").replace(/"/g,'""')}"`).join(";"));
-      }
-      return lines.join("\n");
-    }
-    function parseCsv(text) {
-      const rows = [];
-      let cur = [], val = "", inQuotes = false;
-      for (let i=0; i<text.length; i++) {
-        const c = text[i], n = text[i+1];
-        if (c === '"' && inQuotes && n === '"') { val += '"'; i++; }
-        else if (c === '"') inQuotes = !inQuotes;
-        else if ((c === ";" || c === ",") && !inQuotes) { cur.push(val); val = ""; }
-        else if ((c === "\n" || c === "\r") && !inQuotes) {
-          if (c === "\r" && n === "\n") i++;
-          cur.push(val); val = "";
-          if (cur.some(x => String(x).trim() !== "")) rows.push(cur);
-          cur = [];
-        } else val += c;
-      }
-      cur.push(val); if (cur.some(x => String(x).trim() !== "")) rows.push(cur);
-      if (!rows.length) return [];
-      const headers = rows.shift().map(h => String(h).trim());
-      return rows.map(row => Object.fromEntries(headers.map((h, i) => [h, row[i] ?? ""])));
-    }
-    async function readRowsFromFile(file) {
-      if (!file) throw new Error("Selecione um arquivo.");
-      const name = file.name.toLowerCase();
-      if (name.endsWith(".csv")) return parseCsv(await file.text());
-      if (!window.XLSX) throw new Error("Biblioteca XLSX não carregou. Use CSV ou atualize a página.");
-      const buffer = await file.arrayBuffer();
-      const wb = XLSX.read(buffer, { type: "array", cellDates: true });
-      const sheet = wb.Sheets[wb.SheetNames[0]];
-      return XLSX.utils.sheet_to_json(sheet, { defval: "" });
-    }
-    async function importFile(kind, mode) {
-      const file = kind === "finance" ? $("financeImportFile").files[0] : $("dietImportFile").files[0];
-      try {
-        const rows = await readRowsFromFile(file);
-        const normalized = kind === "finance" ? rows.map(ensureFinance).filter(r => r.valor > 0 || r.item) : rows.map(ensureDiet).filter(r => r.alimento);
-        if (mode === "replace") state[kind] = normalized;
-        else state[kind] = state[kind].concat(normalized);
-        await saveAndRender();
-        $("importStatus").textContent = `${normalized.length} registro(s) importado(s) em ${kind === "finance" ? "financeiro" : "dieta"}.`;
-      } catch (err) {
-        $("importStatus").textContent = "Erro ao importar: " + err.message;
-      }
-    }
-    function addFinanceSample() {
-      const m = monthFromDate(todayISO());
-      state.finance.push(
-        ensureFinance({ data: todayISO(), mes:m, tipo:"Receita", bloco:"Receitas", categoria:"Salário", item:"Salário líquido", valor:4800 }),
-        ensureFinance({ data: todayISO(), mes:m, tipo:"Despesa", bloco:"Despesas Fixas", categoria:"Academia", item:"Academia", valor:150 }),
-        ensureFinance({ data: todayISO(), mes:m, tipo:"Investimento", bloco:"Investimentos / Previdência / Reserva", categoria:"Previdência", item:"Previdência privada", valor:570 })
-      );
-      saveAndRender();
-    }
-    function addDietSample() {
-      const d = todayISO();
-      state.diet.push(
-        ensureDiet({ data:d, refeicao:"Café da manhã", alimento:"Pão integral + proteína", quantidade:"1 porção", calorias:280, proteina:22, carboidrato:32, gordura:6, aguaMl:300 }),
-        ensureDiet({ data:d, refeicao:"Almoço", alimento:"Arroz, feijão e frango", quantidade:"1 prato", calorias:520, proteina:45, carboidrato:65, gordura:8, aguaMl:400 }),
-        ensureDiet({ data:d, refeicao:"Pós-treino", alimento:"Whey + banana", quantidade:"1 shake", calorias:260, proteina:30, carboidrato:32, gordura:2, aguaMl:500 })
-      );
-      saveAndRender();
-    }
-
-    function bindEvents() {
-      $("loginBtn").addEventListener("click", login);
-      $("password").addEventListener("keydown", e => { if (e.key === "Enter") login(); });
-      $("logoutBtn").addEventListener("click", () => location.reload());
-      $("saveNowBtn").addEventListener("click", async () => { await saveEncrypted(); alert("Dados salvos neste navegador."); });
-      $("exportBackupBtn").addEventListener("click", () => download(`backup_portal_pessoal_${todayISO()}.json`, JSON.stringify(state, null, 2)));
-      $("exportJsonBtn").addEventListener("click", () => download(`backup_portal_pessoal_${todayISO()}.json`, JSON.stringify(state, null, 2)));
-      $("importJsonBtn").addEventListener("click", () => $("jsonImportFile").click());
-      $("jsonImportFile").addEventListener("change", async e => {
-        const file = e.target.files[0];
-        if (!file) return;
-        try {
-          const parsed = JSON.parse(await file.text());
-          state = { finance: Array.isArray(parsed.finance) ? parsed.finance.map(ensureFinance) : [], diet: Array.isArray(parsed.diet) ? parsed.diet.map(ensureDiet) : [] };
-          await saveAndRender();
-          $("importStatus").textContent = "Backup importado com sucesso.";
-        } catch(err) { $("importStatus").textContent = "Erro ao importar backup: " + err.message; }
-      });
-      document.querySelectorAll(".tab").forEach(btn => btn.addEventListener("click", () => switchTab(btn.dataset.tab)));
-      ["financeMonthFilter","financeTableMonth","financeTableType","financeSearch","dietDateFilter","dietTableDate","dietTableMeal","dietSearch"].forEach(id => {
-        const el = $(id); if (el) el.addEventListener("input", renderAll);
-      });
-      $("clearDietDateBtn").addEventListener("click", () => { $("dietDateFilter").value = ""; renderAll(); });
-      $("finData").addEventListener("input", () => { const m = monthFromDate($("finData").value); if (m) $("finMes").value = m; });
-      $("addFinanceBtn").addEventListener("click", async () => {
-        state.finance.push(ensureFinance({ data:$("finData").value, mes:$("finMes").value, tipo:$("finTipo").value, bloco:$("finBloco").value, categoria:$("finCategoria").value, item:$("finItem").value, valor:$("finValor").value, observacoes:$("finObs").value }));
-        ["finCategoria","finItem","finValor","finObs"].forEach(id => $(id).value = "");
-        await saveAndRender();
-      });
-      $("addDietBtn").addEventListener("click", async () => {
-        state.diet.push(ensureDiet({ data:$("dietData").value, refeicao:$("dietMeal").value, alimento:$("dietFood").value, quantidade:$("dietQty").value, calorias:$("dietCalories").value, proteina:$("dietProtein").value, carboidrato:$("dietCarbs").value, gordura:$("dietFat").value, aguaMl:$("dietWater").value, observacoes:$("dietObs").value }));
-        ["dietFood","dietQty","dietCalories","dietProtein","dietCarbs","dietFat","dietWater","dietObs"].forEach(id => $(id).value = "");
-        await saveAndRender();
-      });
-      $("financeRecordsTable").addEventListener("input", async e => {
-        const field = e.target.dataset.fin; if (!field) return;
-        const id = e.target.closest("tr").dataset.id;
-        const r = state.finance.find(x => x.id === id); if (!r) return;
-        r[field] = field === "valor" ? parseMoney(e.target.value) : e.target.value;
-        if (field === "data") r.mes = normalizeMonth(r.mes, r.data);
-        await saveAndRender();
-      });
-      $("financeRecordsTable").addEventListener("click", async e => {
-        const act = e.target.dataset.action; if (!act) return;
-        const id = e.target.closest("tr").dataset.id;
-        const idx = state.finance.findIndex(x => x.id === id);
-        if (idx < 0) return;
-        if (act === "del-fin" && confirm("Excluir este lançamento?")) state.finance.splice(idx, 1);
-        if (act === "dup-fin") state.finance.splice(idx+1, 0, { ...state.finance[idx], id: uid() });
-        await saveAndRender();
-      });
-      $("dietRecordsTable").addEventListener("input", async e => {
-        const field = e.target.dataset.diet; if (!field) return;
-        const id = e.target.closest("tr").dataset.id;
-        const r = state.diet.find(x => x.id === id); if (!r) return;
-        r[field] = ["calorias","proteina","carboidrato","gordura","aguaMl"].includes(field) ? parseMoney(e.target.value) : e.target.value;
-        await saveAndRender();
-      });
-      $("dietRecordsTable").addEventListener("click", async e => {
-        const act = e.target.dataset.action; if (!act) return;
-        const id = e.target.closest("tr").dataset.id;
-        const idx = state.diet.findIndex(x => x.id === id);
-        if (idx < 0) return;
-        if (act === "del-diet" && confirm("Excluir esta refeição?")) state.diet.splice(idx, 1);
-        if (act === "dup-diet") state.diet.splice(idx+1, 0, { ...state.diet[idx], id: uid() });
-        await saveAndRender();
-      });
-      $("importFinanceReplaceBtn").addEventListener("click", () => importFile("finance", "replace"));
-      $("importFinanceAppendBtn").addEventListener("click", () => importFile("finance", "append"));
-      $("importDietReplaceBtn").addEventListener("click", () => importFile("diet", "replace"));
-      $("importDietAppendBtn").addEventListener("click", () => importFile("diet", "append"));
-      $("clearFinanceBtn").addEventListener("click", async () => { if(confirm("Limpar todos os dados financeiros deste navegador?")) { state.finance=[]; await saveAndRender(); } });
-      $("clearDietBtn").addEventListener("click", async () => { if(confirm("Limpar todos os dados de dieta deste navegador?")) { state.diet=[]; await saveAndRender(); } });
-      $("clearAllBtn").addEventListener("click", async () => { if(confirm("Limpar tudo deste navegador?")) { state={finance:[], diet:[]}; await saveAndRender(); } });
-      $("addFinanceSampleBtn").addEventListener("click", addFinanceSample);
-      $("addDietSampleBtn").addEventListener("click", addDietSample);
-    }
-    async function login() {
-      const password = $("password").value;
-      $("loginError").textContent = "";
-      if (!password) { $("loginError").textContent = "Digite a senha."; return; }
-      const hash = await sha256Hex(password);
-      if (hash !== PASSWORD_HASH) { $("loginError").textContent = "Senha incorreta."; return; }
-      try {
-        cryptoKey = await deriveKey(password);
-        state = await loadEncrypted();
-        $("login").classList.add("hidden");
-        $("app").classList.remove("hidden");
-        chartDefaults();
-        renderAll();
-      } catch (err) {
-        $("loginError").textContent = "Não consegui abrir os dados salvos com essa senha. Se você trocou de senha, importe um backup ou limpe os dados do navegador.";
-      }
-    }
-    bindEvents();
-    fillSelects();
-  </script>
+<script>
+const PASSWORD_HASH = "372ead080f3fb91706fa98dd8f779081f8189edd5a838b285cc968c025128187";
+const STORE_KEY = "portal_enzo_dark_red_v2";
+let password = "";
+let currentView = "home";
+let charts = {};
+let state = {
+  settings: { kcalGoal: 2200, proteinGoal: 150, carbsGoal: 250, fatGoal: 70, waterGoal: 3, monthlySaveGoal: 700 },
+  finance: [], diet: [], workouts: [], measures: []
+};
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const brl = n => Number(n||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const num = n => Number(n||0).toLocaleString('pt-BR',{maximumFractionDigits:1});
+const isoToday = () => new Date().toISOString().slice(0,10);
+const fmtDate = d => d ? new Date(d+'T12:00:00').toLocaleDateString('pt-BR') : '-';
+function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2600); }
+function escapeHtml(str){ return String(str??'').replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m])); }
+function uid(){ return Math.random().toString(36).slice(2,10); }
+async function sha256(text){ const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text)); return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join(''); }
+function b64(buf){ return btoa(String.fromCharCode(...new Uint8Array(buf))); }
+function unb64(str){ return Uint8Array.from(atob(str), c => c.charCodeAt(0)); }
+async function keyFromPassword(pass, salt){ const baseKey = await crypto.subtle.importKey('raw', new TextEncoder().encode(pass), 'PBKDF2', false, ['deriveKey']); return crypto.subtle.deriveKey({name:'PBKDF2', salt, iterations:140000, hash:'SHA-256'}, baseKey, {name:'AES-GCM', length:256}, false, ['encrypt','decrypt']); }
+async function save(){ try{ const salt=crypto.getRandomValues(new Uint8Array(16)); const iv=crypto.getRandomValues(new Uint8Array(12)); const key=await keyFromPassword(password, salt); const plain=new TextEncoder().encode(JSON.stringify(state)); const cipher=await crypto.subtle.encrypt({name:'AES-GCM',iv},key,plain); localStorage.setItem(STORE_KEY, JSON.stringify({salt:b64(salt), iv:b64(iv), data:b64(cipher)})); }catch(e){ console.error(e); toast('Não consegui salvar os dados.'); } }
+async function load(){ const saved=localStorage.getItem(STORE_KEY); if(!saved){ seedData(); await save(); return; } try{ const obj=JSON.parse(saved); const salt=unb64(obj.salt), iv=unb64(obj.iv); const key=await keyFromPassword(password, salt); const plain=await crypto.subtle.decrypt({name:'AES-GCM',iv},key,unb64(obj.data)); state = JSON.parse(new TextDecoder().decode(plain)); state.settings ||= {kcalGoal:2200,proteinGoal:150,carbsGoal:250,fatGoal:70,waterGoal:3,monthlySaveGoal:700}; state.finance ||= []; state.diet ||= []; state.workouts ||= []; state.measures ||= []; }catch(e){ seedData(); toast('Dados locais não abriram. Carreguei um modelo inicial.'); } }
+function seedData(){ const today=isoToday(); state.finance=[
+  {id:uid(),date:today,type:'Receita',category:'Salário',item:'Salário líquido',amount:4800},
+  {id:uid(),date:today,type:'Receita',category:'Benefício',item:'VR',amount:960},
+  {id:uid(),date:today,type:'Despesa',category:'Fixos',item:'Consórcio',amount:560},
+  {id:uid(),date:today,type:'Despesa',category:'Fixos',item:'Seguro do carro',amount:280},
+  {id:uid(),date:today,type:'Investimento',category:'Previdência',item:'Previdência privada',amount:570},
+  {id:uid(),date:today,type:'Despesa',category:'Saúde',item:'Academia',amount:150}
+]; state.diet=[
+  {id:uid(),date:today,meal:'Café da manhã',food:'Pão integral + proteína',quantity:'1 porção',kcal:320,protein:28,carbs:36,fat:8,water:0.3},
+  {id:uid(),date:today,meal:'Almoço',food:'Arroz, feijão, frango e salada',quantity:'1 prato',kcal:650,protein:45,carbs:70,fat:15,water:0.5},
+  {id:uid(),date:today,meal:'Lanche',food:'Whey + banana',quantity:'1 porção',kcal:260,protein:28,carbs:32,fat:2,water:0.4}
+]; state.workouts=[
+  {id:uid(),date:today,group:'Peito e tríceps',exercise:'Supino reto',sets:4,reps:'8-10',load:60,duration:25,notes:'Boa execução'},
+  {id:uid(),date:today,group:'Cardio',exercise:'Esteira',sets:1,reps:'-',load:0,duration:30,notes:'Leve/moderado'}
+]; state.measures=[{id:uid(),date:today,weight:81.4,waist:0,water:2.1,notes:'Modelo inicial'}]; }
+function destroyCharts(){ Object.values(charts).forEach(c=>{try{c.destroy()}catch(e){}}); charts={}; }
+function chart(id,type,data,options={}){ const el=document.getElementById(id); if(!el||!window.Chart)return; charts[id]=new Chart(el,{type,data,options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#cfd3df'}},tooltip:{backgroundColor:'#11141b',borderColor:'#ff2438',borderWidth:1}},scales:type==='doughnut'||type==='pie'?{}:{x:{ticks:{color:'#8f95a3'},grid:{color:'rgba(255,255,255,.06)'}},y:{ticks:{color:'#8f95a3'},grid:{color:'rgba(255,255,255,.06)'}}},...options}}); }
+function setView(v){ currentView=v; destroyCharts(); $$('.nav-item').forEach(b=>b.classList.toggle('active', b.dataset.view===v)); const titleMap={home:'Dashboard geral','finance-dashboard':'Dashboard financeiro','finance-add':'Adicionar lançamento','finance-list':'Lançamentos financeiros','finance-goals':'Metas e resumo','diet-dashboard':'Dashboard dieta','diet-add':'Adicionar refeição','diet-list':'Refeições','diet-measures':'Água, peso e medidas','workout-dashboard':'Dashboard treino','workout-add':'Adicionar treino','workout-list':'Histórico de treinos','workout-progress':'Evolução de treino','backup':'Backup e dados','settings':'Preferências','data-finance':'Importar financeiro','data-diet':'Importar dieta','data-workout':'Importar treino'}; $('#topTitle').textContent=titleMap[v]||'Portal'; if(v.startsWith('finance')||v==='data-finance') $('#group-financeiro').classList.add('open'); if(v.startsWith('diet')||v==='data-diet') $('#group-dieta').classList.add('open'); if(v.startsWith('workout')||v==='data-workout') $('#group-treino').classList.add('open'); render(); $('#sidebar').classList.remove('open'); }
+function pageHead(title,sub,icon='') { return `<div class="page-head"><div><h1>${icon?`<span class="red">${icon}</span> `:''}${title}</h1><p>${sub}</p></div><div class="pill">Atualizado em ${new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}</div></div>`; }
+function kpi(title,value,sub,hot=false){ return `<div class="card ${hot?'hot':''}"><div class="kpi-title">${title}</div><div class="kpi-value">${value}</div><div class="kpi-sub">${sub||''}</div></div>`; }
+function financeSummary(){ const receitas=state.finance.filter(x=>x.type==='Receita').reduce((s,x)=>s+Number(x.amount||0),0); const despesas=state.finance.filter(x=>x.type==='Despesa').reduce((s,x)=>s+Number(x.amount||0),0); const inv=state.finance.filter(x=>x.type==='Investimento').reduce((s,x)=>s+Number(x.amount||0),0); return {receitas,despesas,inv,saldo:receitas-despesas-inv}; }
+function dietToday(){ const today=isoToday(); const rows=state.diet.filter(x=>x.date===today); const m=state.measures.filter(x=>x.date===today).slice(-1)[0]||{}; const sum=k=>rows.reduce((s,x)=>s+Number(x[k]||0),0); return {rows,kcal:sum('kcal'),protein:sum('protein'),carbs:sum('carbs'),fat:sum('fat'),water:Number(m.water||rows.reduce((s,x)=>s+Number(x.water||0),0))}; }
+function workoutSummary(){ const total=state.workouts.length; const dates=[...new Set(state.workouts.map(x=>x.date))].length; const minutes=state.workouts.reduce((s,x)=>s+Number(x.duration||0),0); return {total,dates,minutes}; }
+function home(){ const f=financeSummary(), d=dietToday(), w=workoutSummary(); return `${pageHead('Dashboard geral','Uma visão rápida dos seus pilares: dinheiro, dieta e treino.','▦')}<div class="grid kpis">${kpi('Saldo financeiro',brl(f.saldo),'Receitas - saídas - investimentos',f.saldo<0)}${kpi('Calorias hoje',`${num(d.kcal)} <span class="small">/ ${state.settings.kcalGoal}</span>`,'Consumo lançado no dia')}${kpi('Treinos registrados',w.total,'Total de exercícios/atividades')}${kpi('Água hoje',`${num(d.water)}L <span class="small">/ ${state.settings.waterGoal}L</span>`,'Registro do dia')}</div><div class="grid layout-3"><div class="card chart-card"><div class="section-title"><h3><span>◉</span>Financeiro</h3><button class="mini-btn" data-view="finance-dashboard">Abrir</button></div><canvas id="homeFinance"></canvas></div><div class="card chart-card"><div class="section-title"><h3><span>▰</span>Macros do dia</h3><button class="mini-btn" data-view="diet-dashboard">Abrir</button></div><canvas id="homeDiet"></canvas></div><div class="card"><div class="section-title"><h3><span>▱</span>Treino</h3><button class="mini-btn" data-view="workout-dashboard">Abrir</button></div><p class="muted">Minutos registrados</p><div class="kpi-value">${num(w.minutes)} min</div><div class="progress"><div class="bar" style="width:${Math.min(100,w.minutes/180*100)}%"></div></div><div class="divider"></div><p class="muted">Dias com atividade: <b>${w.dates}</b></p></div></div>`; }
+function renderHomeCharts(){ const f=financeSummary(), d=dietToday(); chart('homeFinance','doughnut',{labels:['Receitas','Despesas','Investimentos'],datasets:[{data:[f.receitas,f.despesas,f.inv],backgroundColor:['#21d07a','#ff2438','#f59e0b'],borderColor:'#0b0d12'}]}); chart('homeDiet','doughnut',{labels:['Proteína','Carboidrato','Gordura'],datasets:[{data:[d.protein,d.carbs,d.fat],backgroundColor:['#ff2438','#b51220','#6d7280'],borderColor:'#0b0d12'}]}); }
+function financeDashboard(){ const f=financeSummary(); const cats={}; state.finance.filter(x=>x.type!=='Receita').forEach(x=>cats[x.category||'Outros']=(cats[x.category||'Outros']||0)+Number(x.amount||0)); const recent=state.finance.slice(-6).reverse(); return `${pageHead('Dashboard Financeiro','Acompanhe receitas, gastos, investimentos e resultado.','◉')}<div class="grid kpis">${kpi('Receitas',brl(f.receitas),'Entradas lançadas')}${kpi('Saídas',brl(f.despesas),'Despesas registradas',true)}${kpi('Investimentos',brl(f.inv),'Reservas e aplicações')}${kpi('Resultado',brl(f.saldo),f.saldo>=0?'Mês positivo':'Atenção: negativo',f.saldo<0)}</div><div class="grid layout-2"><div class="card chart-card"><div class="section-title"><h3><span>●</span>Composição financeira</h3><button class="mini-btn" data-view="finance-add">Adicionar</button></div><canvas id="financeChart"></canvas></div><div class="card chart-card"><div class="section-title"><h3><span>●</span>Saídas por categoria</h3></div><canvas id="financeCat"></canvas></div></div><div class="card"><div class="section-title"><h3><span>●</span>Últimos lançamentos</h3><button class="mini-btn" data-view="finance-list">Ver todos</button></div>${tableFinance(recent,false)}</div>`; }
+function renderFinanceCharts(){ const f=financeSummary(); const cats={}; state.finance.filter(x=>x.type!=='Receita').forEach(x=>cats[x.category||'Outros']=(cats[x.category||'Outros']||0)+Number(x.amount||0)); chart('financeChart','bar',{labels:['Receitas','Despesas','Investimentos','Resultado'],datasets:[{label:'R$',data:[f.receitas,f.despesas,f.inv,f.saldo],backgroundColor:['#21d07a','#ff2438','#f59e0b',f.saldo>=0?'#60a5fa':'#b51220']}]}); chart('financeCat','doughnut',{labels:Object.keys(cats),datasets:[{data:Object.values(cats),backgroundColor:['#ff2438','#b51220','#6e0a14','#4b5563','#f59e0b','#60a5fa'],borderColor:'#0b0d12'}]}); }
+function financeForm(){ return `${pageHead('Adicionar lançamento','Cadastre receitas, despesas ou investimentos.','+')}<div class="card"><form id="financeForm" class="form-grid"><div class="field"><label>Data</label><input class="input" name="date" type="date" value="${isoToday()}"></div><div class="field"><label>Tipo</label><select class="select" name="type"><option>Despesa</option><option>Receita</option><option>Investimento</option></select></div><div class="field"><label>Categoria</label><input class="input" name="category" placeholder="Ex: Alimentação, fixos, salário"></div><div class="field"><label>Valor</label><input class="input" name="amount" type="number" step="0.01" placeholder="Ex: 150"></div><div class="field full"><label>Item/descrição</label><input class="input" name="item" placeholder="Ex: Academia, mercado, salário"></div><div class="actions full"><button class="btn" type="submit">Adicionar lançamento</button><button class="btn secondary" type="reset">Limpar</button></div></form></div>`; }
+function tableFinance(rows=state.finance, editable=true){ if(!rows.length) return `<div class="empty">Nenhum lançamento encontrado.</div>`; return `<div class="table-wrap"><table><thead><tr><th>Data</th><th>Tipo</th><th>Categoria</th><th>Item</th><th>Valor</th>${editable?'<th>Ações</th>':''}</tr></thead><tbody>${rows.map(r=>`<tr><td>${fmtDate(r.date)}</td><td><span class="tag ${r.type==='Receita'?'good':''}">${escapeHtml(r.type)}</span></td><td>${escapeHtml(r.category)}</td><td>${escapeHtml(r.item)}</td><td class="value">${brl(r.amount)}</td>${editable?`<td><button class="mini-btn" onclick="delItem('finance','${r.id}')">Excluir</button></td>`:''}</tr>`).join('')}</tbody></table></div>`; }
+function financeList(){ return `${pageHead('Lançamentos financeiros','Revise e exclua lançamentos.','☷')}<div class="card"><div class="section-title"><h3><span>●</span>Base financeira</h3><button class="mini-btn" data-view="finance-add">Novo lançamento</button></div>${tableFinance()}</div>`; }
+function financeGoals(){ const f=financeSummary(), pct=Math.min(100, f.inv/(state.settings.monthlySaveGoal||1)*100); return `${pageHead('Metas e resumo','Acompanhe sua meta mensal de reserva.','◎')}<div class="grid kpis">${kpi('Meta de reserva',brl(state.settings.monthlySaveGoal),'Definida em preferências')}${kpi('Investido',brl(f.inv),`${num(pct)}% da meta`)}${kpi('Disponível',brl(f.saldo),'Resultado após tudo')}${kpi('Comprometimento',`${num((f.despesas+f.inv)/(f.receitas||1)*100)}%`,'Saídas + investimentos / receitas')}</div><div class="card"><h3><span class="red">●</span> Progresso da meta</h3><div class="progress"><div class="bar" style="width:${pct}%"></div></div></div>`; }
+function dietDashboard(){ const d=dietToday(); return `${pageHead('Dashboard Dieta','Acompanhe refeições, calorias, macros, água e evolução diária.','▰')}<div class="grid kpis">${kpi('Calorias',`${num(d.kcal)} <span class="small">/ ${state.settings.kcalGoal}</span>`,`Restantes: ${num(Math.max(0,state.settings.kcalGoal-d.kcal))} kcal`,true)}${kpi('Proteínas',`${num(d.protein)}g <span class="small">/ ${state.settings.proteinGoal}g</span>`,'Meta diária')}${kpi('Carboidratos',`${num(d.carbs)}g <span class="small">/ ${state.settings.carbsGoal}g</span>`,'Meta diária')}${kpi('Água',`${num(d.water)}L <span class="small">/ ${state.settings.waterGoal}L</span>`,'Registro do dia')}</div><div class="grid layout-2"><div class="card"><div class="section-title"><h3><span>●</span>Refeições do dia</h3><button class="mini-btn" data-view="diet-add">Adicionar</button></div>${mealCards(d.rows)}</div><div class="card">${dietFormInner()}</div></div><div class="grid layout-2"><div class="card chart-card"><div class="section-title"><h3><span>●</span>Distribuição de macros</h3></div><canvas id="macroChart"></canvas></div><div class="card chart-card"><div class="section-title"><h3><span>●</span>Calorias por refeição</h3></div><canvas id="calChart"></canvas></div></div>`; }
+function mealCards(rows){ if(!rows.length) return `<div class="empty">Nenhuma refeição lançada hoje.</div>`; return rows.map(r=>`<div class="meal-card"><div><b>${escapeHtml(r.meal)}</b><small>${escapeHtml(r.food)} • ${escapeHtml(r.quantity)}</small></div><div class="macro"><b>${num(r.kcal)}</b><small>kcal</small></div><div class="macro"><b>${num(r.protein)}g</b><small>P</small></div><div class="macro"><b>${num(r.carbs)}g</b><small>C</small></div><div class="macro"><b>${num(r.fat)}g</b><small>G</small></div><button class="mini-btn" onclick="delItem('diet','${r.id}')">×</button></div>`).join(''); }
+function renderDietCharts(){ const d=dietToday(); chart('macroChart','doughnut',{labels:['Proteínas','Carboidratos','Gorduras'],datasets:[{data:[d.protein,d.carbs,d.fat],backgroundColor:['#ff2438','#b51220','#6d7280'],borderColor:'#0b0d12'}]}); const labels=d.rows.map(x=>x.meal); chart('calChart','bar',{labels,datasets:[{label:'kcal',data:d.rows.map(x=>x.kcal),backgroundColor:'#ff2438'}]}); }
+function dietFormInner(){ return `<div class="section-title"><h3><span>+</span>Adicionar refeição</h3></div><form id="dietForm" class="form-grid"><div class="field"><label>Data</label><input class="input" name="date" type="date" value="${isoToday()}"></div><div class="field"><label>Refeição</label><select class="select" name="meal"><option>Café da manhã</option><option>Lanche da manhã</option><option>Almoço</option><option>Lanche da tarde</option><option>Jantar</option><option>Ceia</option></select></div><div class="field full"><label>Alimento/refeição</label><input class="input" name="food" placeholder="Ex: Frango grelhado, arroz e salada"></div><div class="field"><label>Quantidade</label><input class="input" name="quantity" placeholder="Ex: 150g"></div><div class="field"><label>Calorias</label><input class="input" name="kcal" type="number" step="1"></div><div class="field"><label>Proteína (g)</label><input class="input" name="protein" type="number" step="0.1"></div><div class="field"><label>Carboidratos (g)</label><input class="input" name="carbs" type="number" step="0.1"></div><div class="field"><label>Gorduras (g)</label><input class="input" name="fat" type="number" step="0.1"></div><div class="field full"><label>Água junto/registro (L)</label><input class="input" name="water" type="number" step="0.1" placeholder="Ex: 0.5"></div><div class="actions full"><button class="btn" type="submit">Adicionar refeição</button><button class="btn secondary" type="reset">Limpar</button></div></form>`; }
+function dietAdd(){ return `${pageHead('Adicionar refeição','Insira os alimentos do dia.','+')}<div class="card">${dietFormInner()}</div>`; }
+function dietList(){ return `${pageHead('Refeições','Histórico de refeições cadastradas.','☷')}<div class="card"><div class="section-title"><h3><span>●</span>Base de refeições</h3><button class="mini-btn" data-view="diet-add">Nova refeição</button></div>${tableDiet()}</div>`; }
+function tableDiet(rows=state.diet){ if(!rows.length) return `<div class="empty">Nenhuma refeição cadastrada.</div>`; return `<div class="table-wrap"><table><thead><tr><th>Data</th><th>Refeição</th><th>Alimento</th><th>Qtd.</th><th>kcal</th><th>P</th><th>C</th><th>G</th><th></th></tr></thead><tbody>${rows.slice().reverse().map(r=>`<tr><td>${fmtDate(r.date)}</td><td>${escapeHtml(r.meal)}</td><td>${escapeHtml(r.food)}</td><td>${escapeHtml(r.quantity)}</td><td class="value">${num(r.kcal)}</td><td>${num(r.protein)}g</td><td>${num(r.carbs)}g</td><td>${num(r.fat)}g</td><td><button class="mini-btn" onclick="delItem('diet','${r.id}')">Excluir</button></td></tr>`).join('')}</tbody></table></div>`; }
+function dietMeasures(){ return `${pageHead('Água, peso e medidas','Registre sua evolução de forma simples.','◌')}<div class="grid layout-2"><div class="card"><form id="measureForm" class="form-grid"><div class="field"><label>Data</label><input class="input" name="date" type="date" value="${isoToday()}"></div><div class="field"><label>Peso (kg)</label><input class="input" name="weight" type="number" step="0.1"></div><div class="field"><label>Cintura (cm)</label><input class="input" name="waist" type="number" step="0.1"></div><div class="field"><label>Água do dia (L)</label><input class="input" name="water" type="number" step="0.1"></div><div class="field full"><label>Observações</label><textarea class="textarea" name="notes"></textarea></div><div class="actions full"><button class="btn" type="submit">Salvar medida</button></div></form></div><div class="card chart-card"><div class="section-title"><h3><span>●</span>Evolução de peso</h3></div><canvas id="weightChart"></canvas></div></div><div class="card">${tableMeasures()}</div>`; }
+function tableMeasures(){ if(!state.measures.length) return `<div class="empty">Sem medidas registradas.</div>`; return `<div class="table-wrap"><table><thead><tr><th>Data</th><th>Peso</th><th>Cintura</th><th>Água</th><th>Obs.</th><th></th></tr></thead><tbody>${state.measures.slice().reverse().map(r=>`<tr><td>${fmtDate(r.date)}</td><td>${num(r.weight)} kg</td><td>${num(r.waist)} cm</td><td>${num(r.water)} L</td><td>${escapeHtml(r.notes)}</td><td><button class="mini-btn" onclick="delItem('measures','${r.id}')">Excluir</button></td></tr>`).join('')}</tbody></table></div>`; }
+function renderWeightChart(){ const rows=state.measures.slice().sort((a,b)=>a.date.localeCompare(b.date)); chart('weightChart','line',{labels:rows.map(x=>fmtDate(x.date)),datasets:[{label:'Peso kg',data:rows.map(x=>x.weight),borderColor:'#ff2438',backgroundColor:'rgba(255,36,56,.18)',fill:true,tension:.35}]}); }
+function workoutDashboard(){ const w=workoutSummary(); const groups={}; state.workouts.forEach(x=>groups[x.group||'Outros']=(groups[x.group||'Outros']||0)+Number(x.duration||0)); return `${pageHead('Dashboard Treino','Controle treinos, exercícios, cargas e frequência.','▱')}<div class="grid kpis">${kpi('Registros',w.total,'Exercícios/atividades')}${kpi('Dias treinados',w.dates,'Datas com registro')}${kpi('Tempo total',`${num(w.minutes)} min`,'Soma dos treinos')}${kpi('Média por dia',`${num(w.minutes/(w.dates||1))} min`,'Nos dias com treino')}</div><div class="grid layout-2"><div class="card chart-card"><div class="section-title"><h3><span>●</span>Tempo por grupo</h3><button class="mini-btn" data-view="workout-add">Adicionar</button></div><canvas id="workoutChart"></canvas></div><div class="card"><div class="section-title"><h3><span>●</span>Últimos treinos</h3></div>${tableWorkout(state.workouts.slice(-6).reverse(),false)}</div></div>`; }
+function renderWorkoutCharts(){ const groups={}; state.workouts.forEach(x=>groups[x.group||'Outros']=(groups[x.group||'Outros']||0)+Number(x.duration||0)); chart('workoutChart','bar',{labels:Object.keys(groups),datasets:[{label:'minutos',data:Object.values(groups),backgroundColor:'#ff2438'}]}); }
+function workoutForm(){ return `${pageHead('Adicionar treino','Registre exercícios, séries e cargas.','+')}<div class="card"><form id="workoutForm" class="form-grid"><div class="field"><label>Data</label><input class="input" name="date" type="date" value="${isoToday()}"></div><div class="field"><label>Grupo</label><input class="input" name="group" placeholder="Ex: Peito, Costas, Pernas, Cardio"></div><div class="field full"><label>Exercício</label><input class="input" name="exercise" placeholder="Ex: Supino reto"></div><div class="field"><label>Séries</label><input class="input" name="sets" type="number" step="1"></div><div class="field"><label>Repetições</label><input class="input" name="reps" placeholder="Ex: 8-10"></div><div class="field"><label>Carga</label><input class="input" name="load" type="number" step="0.5" placeholder="kg"></div><div class="field"><label>Duração</label><input class="input" name="duration" type="number" step="1" placeholder="min"></div><div class="field full"><label>Observações</label><textarea class="textarea" name="notes"></textarea></div><div class="actions full"><button class="btn" type="submit">Adicionar treino</button><button class="btn secondary" type="reset">Limpar</button></div></form></div>`; }
+function tableWorkout(rows=state.workouts, editable=true){ if(!rows.length) return `<div class="empty">Nenhum treino registrado.</div>`; return `<div class="table-wrap"><table><thead><tr><th>Data</th><th>Grupo</th><th>Exercício</th><th>Séries</th><th>Reps</th><th>Carga</th><th>Duração</th>${editable?'<th></th>':''}</tr></thead><tbody>${rows.map(r=>`<tr><td>${fmtDate(r.date)}</td><td>${escapeHtml(r.group)}</td><td>${escapeHtml(r.exercise)}</td><td>${r.sets||''}</td><td>${escapeHtml(r.reps)}</td><td>${num(r.load)} kg</td><td>${num(r.duration)} min</td>${editable?`<td><button class="mini-btn" onclick="delItem('workouts','${r.id}')">Excluir</button></td>`:''}</tr>`).join('')}</tbody></table></div>`; }
+function workoutList(){ return `${pageHead('Histórico de treinos','Todos os treinos e exercícios registrados.','☷')}<div class="card"><div class="section-title"><h3><span>●</span>Base de treino</h3><button class="mini-btn" data-view="workout-add">Novo treino</button></div>${tableWorkout()}</div>`; }
+function workoutProgress(){ return `${pageHead('Evolução de treino','Acompanhe frequência e volume.','◎')}<div class="grid layout-2"><div class="card chart-card"><div class="section-title"><h3><span>●</span>Minutos por dia</h3></div><canvas id="workoutProgress"></canvas></div><div class="card">${tableWorkout(state.workouts.slice(-8).reverse(),false)}</div></div>`; }
+function renderWorkoutProgress(){ const byDate={}; state.workouts.forEach(x=>byDate[x.date]=(byDate[x.date]||0)+Number(x.duration||0)); const labels=Object.keys(byDate).sort(); chart('workoutProgress','line',{labels:labels.map(fmtDate),datasets:[{label:'minutos',data:labels.map(k=>byDate[k]),borderColor:'#ff2438',backgroundColor:'rgba(255,36,56,.18)',fill:true,tension:.35}]}); }
+function backupPage(type='all'){ return `${pageHead('Backup e dados','Importe planilhas, baixe modelos e exporte seus dados.','▣')}<div class="grid layout-3"><div class="card filebox"><h3>Importar financeiro</h3><p class="muted">Colunas: Data, Tipo, Categoria, Item, Valor.</p><input id="importFinance" type="file" accept=".xlsx,.csv"></div><div class="card filebox"><h3>Importar dieta</h3><p class="muted">Colunas: Data, Refeição, Alimento, Quantidade, Calorias, Proteína, Carboidratos, Gorduras, Água.</p><input id="importDiet" type="file" accept=".xlsx,.csv"></div><div class="card filebox"><h3>Importar treino</h3><p class="muted">Colunas: Data, Grupo, Exercício, Séries, Repetições, Carga, Duração, Observações.</p><input id="importWorkout" type="file" accept=".xlsx,.csv"></div></div><div class="grid layout-2"><div class="card"><div class="section-title"><h3><span>●</span>Modelos de planilha</h3></div><div class="actions"><a class="btn secondary" href="modelo_lancamentos_financeiros.xlsx" download>Modelo financeiro XLSX</a><a class="btn secondary" href="modelo_refeicoes_dieta.xlsx" download>Modelo dieta XLSX</a><a class="btn secondary" href="modelo_treinos.xlsx" download>Modelo treino XLSX</a></div></div><div class="card"><div class="section-title"><h3><span>●</span>Backup completo</h3></div><p class="muted">Exporte ou importe um arquivo JSON com tudo que está salvo no seu navegador.</p><div class="actions"><button id="exportJson" class="btn">Exportar backup</button><label class="btn secondary" style="display:inline-flex;align-items:center;gap:8px">Importar backup <input id="importJson" type="file" accept=".json" style="display:none"></label><button id="clearAll" class="btn danger">Limpar tudo</button></div></div></div>`; }
+function settingsPage(){ const s=state.settings; return `${pageHead('Preferências','Ajuste metas do dashboard.','⚙')}<div class="card"><form id="settingsForm" class="form-grid"><div class="field"><label>Meta de calorias</label><input class="input" name="kcalGoal" type="number" value="${s.kcalGoal}"></div><div class="field"><label>Meta de proteína (g)</label><input class="input" name="proteinGoal" type="number" value="${s.proteinGoal}"></div><div class="field"><label>Meta de carboidratos (g)</label><input class="input" name="carbsGoal" type="number" value="${s.carbsGoal}"></div><div class="field"><label>Meta de gorduras (g)</label><input class="input" name="fatGoal" type="number" value="${s.fatGoal}"></div><div class="field"><label>Meta de água (L)</label><input class="input" name="waterGoal" type="number" step="0.1" value="${s.waterGoal}"></div><div class="field"><label>Meta financeira mensal</label><input class="input" name="monthlySaveGoal" type="number" step="0.01" value="${s.monthlySaveGoal}"></div><div class="actions full"><button class="btn" type="submit">Salvar preferências</button></div></form></div>`; }
+function render(){ const v=$('#view'); if(currentView==='home') v.innerHTML=home(); else if(currentView==='finance-dashboard') v.innerHTML=financeDashboard(); else if(currentView==='finance-add') v.innerHTML=financeForm(); else if(currentView==='finance-list') v.innerHTML=financeList(); else if(currentView==='finance-goals') v.innerHTML=financeGoals(); else if(currentView==='diet-dashboard') v.innerHTML=dietDashboard(); else if(currentView==='diet-add') v.innerHTML=dietAdd(); else if(currentView==='diet-list') v.innerHTML=dietList(); else if(currentView==='diet-measures') v.innerHTML=dietMeasures(); else if(currentView==='workout-dashboard') v.innerHTML=workoutDashboard(); else if(currentView==='workout-add') v.innerHTML=workoutForm(); else if(currentView==='workout-list') v.innerHTML=workoutList(); else if(currentView==='workout-progress') v.innerHTML=workoutProgress(); else if(currentView==='backup'||currentView.startsWith('data-')) v.innerHTML=backupPage(); else if(currentView==='settings') v.innerHTML=settingsPage(); bindDynamic(); setTimeout(()=>{ if(currentView==='home') renderHomeCharts(); if(currentView==='finance-dashboard') renderFinanceCharts(); if(currentView==='diet-dashboard') renderDietCharts(); if(currentView==='diet-measures') renderWeightChart(); if(currentView==='workout-dashboard') renderWorkoutCharts(); if(currentView==='workout-progress') renderWorkoutProgress();},0); }
+function bindDynamic(){ $$('[data-view]').forEach(el=>{ if(el.dataset.bound) return; el.dataset.bound=1; el.addEventListener('click',()=>setView(el.dataset.view)); }); const ff=$('#financeForm'); if(ff) ff.onsubmit=async e=>{ e.preventDefault(); const f=Object.fromEntries(new FormData(ff)); state.finance.push({id:uid(),date:f.date,type:f.type,category:f.category,item:f.item,amount:Number(f.amount||0)}); await save(); toast('Lançamento adicionado.'); setView('finance-dashboard'); };
+ const df=$('#dietForm'); if(df) df.onsubmit=async e=>{ e.preventDefault(); const f=Object.fromEntries(new FormData(df)); state.diet.push({id:uid(),date:f.date,meal:f.meal,food:f.food,quantity:f.quantity,kcal:Number(f.kcal||0),protein:Number(f.protein||0),carbs:Number(f.carbs||0),fat:Number(f.fat||0),water:Number(f.water||0)}); await save(); toast('Refeição adicionada.'); setView('diet-dashboard'); };
+ const mf=$('#measureForm'); if(mf) mf.onsubmit=async e=>{ e.preventDefault(); const f=Object.fromEntries(new FormData(mf)); state.measures.push({id:uid(),date:f.date,weight:Number(f.weight||0),waist:Number(f.waist||0),water:Number(f.water||0),notes:f.notes}); await save(); toast('Medida salva.'); setView('diet-measures'); };
+ const wf=$('#workoutForm'); if(wf) wf.onsubmit=async e=>{ e.preventDefault(); const f=Object.fromEntries(new FormData(wf)); state.workouts.push({id:uid(),date:f.date,group:f.group,exercise:f.exercise,sets:Number(f.sets||0),reps:f.reps,load:Number(f.load||0),duration:Number(f.duration||0),notes:f.notes}); await save(); toast('Treino adicionado.'); setView('workout-dashboard'); };
+ const sf=$('#settingsForm'); if(sf) sf.onsubmit=async e=>{ e.preventDefault(); const f=Object.fromEntries(new FormData(sf)); Object.keys(f).forEach(k=>state.settings[k]=Number(f[k]||0)); await save(); toast('Preferências salvas.'); setView('settings'); };
+ const imf=$('#importFinance'); if(imf) imf.onchange=e=>importSheet(e.target.files[0],'finance'); const imd=$('#importDiet'); if(imd) imd.onchange=e=>importSheet(e.target.files[0],'diet'); const imw=$('#importWorkout'); if(imw) imw.onchange=e=>importSheet(e.target.files[0],'workouts'); const ex=$('#exportJson'); if(ex) ex.onclick=()=>downloadJson(); const ij=$('#importJson'); if(ij) ij.onchange=e=>importJson(e.target.files[0]); const clear=$('#clearAll'); if(clear) clear.onclick=async()=>{ if(confirm('Tem certeza que deseja limpar todos os dados salvos neste navegador?')){ seedData(); await save(); toast('Dados redefinidos.'); setView('home'); } } }
+window.delItem = async function(collection,id){ state[collection]=state[collection].filter(x=>x.id!==id); await save(); toast('Item excluído.'); render(); };
+function normalizeHeader(h){ return String(h||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim(); }
+function parseDate(v){ if(!v) return isoToday(); if(typeof v==='number'){ const d=XLSX.SSF.parse_date_code(v); return `${d.y}-${String(d.m).padStart(2,'0')}-${String(d.d).padStart(2,'0')}`; } const s=String(v).trim(); if(/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0,10); const m=s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/); if(m){ const y=m[3].length===2?'20'+m[3]:m[3]; return `${y}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`; } return isoToday(); }
+function nval(v){ if(v==null||v==='') return 0; return Number(String(v).replace('R$','').replace(/\./g,'').replace(',','.').trim())||0; }
+async function importSheet(file,type){ if(!file) return; const data=await file.arrayBuffer(); const wb=XLSX.read(data,{type:'array',cellDates:false}); const ws=wb.Sheets[wb.SheetNames[0]]; const rows=XLSX.utils.sheet_to_json(ws,{defval:''}); let add=[]; rows.forEach(r=>{ const o={}; Object.entries(r).forEach(([k,v])=>o[normalizeHeader(k)]=v); if(type==='finance') add.push({id:uid(),date:parseDate(o.data),type:o.tipo||'Despesa',category:o.categoria||o.bloco||'Outros',item:o.item||o.descricao||'',amount:nval(o.valor)}); if(type==='diet') add.push({id:uid(),date:parseDate(o.data),meal:o.refeicao||o['refeicao']||'Refeição',food:o.alimento||'',quantity:o.quantidade||'',kcal:nval(o.calorias||o.kcal),protein:nval(o.proteina),carbs:nval(o.carboidratos||o.carbo),fat:nval(o.gorduras||o.gordura),water:nval(o.agua)}); if(type==='workouts') add.push({id:uid(),date:parseDate(o.data),group:o.grupo||'',exercise:o.exercicio||'',sets:nval(o.series),reps:o.repeticoes||o.reps||'',load:nval(o.carga),duration:nval(o.duracao),notes:o.observacoes||''}); }); state[type].push(...add); await save(); toast(`${add.length} linha(s) importada(s).`); setView(type==='finance'?'finance-dashboard':type==='diet'?'diet-dashboard':'workout-dashboard'); }
+function downloadJson(){ const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='backup_portal_pessoal_enzo.json'; a.click(); URL.revokeObjectURL(a.href); }
+async function importJson(file){ if(!file)return; const txt=await file.text(); state=JSON.parse(txt); state.settings ||= {}; state.finance ||= []; state.diet ||= []; state.workouts ||= []; state.measures ||= []; await save(); toast('Backup importado.'); setView('home'); }
+async function login(){ const p=$('#password').value; const h=await sha256(p); if(h!==PASSWORD_HASH){ $('#loginError').classList.remove('hidden'); return; } password=p; await load(); $('#login').classList.add('hidden'); $('#app').classList.remove('hidden'); $('#todayPill').textContent=new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'}); setView('home'); }
+$('#loginBtn').addEventListener('click',login); $('#password').addEventListener('keydown',e=>{ if(e.key==='Enter') login(); }); $('#logout').addEventListener('click',()=>location.reload()); $('#mobileMenu').addEventListener('click',()=>$('#sidebar').classList.toggle('open'));
+$$('.nav-item').forEach(b=>b.addEventListener('click',()=>setView(b.dataset.view)));
+</script>
 </body>
 </html>

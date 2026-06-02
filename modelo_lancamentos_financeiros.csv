@@ -1,4 +1,4 @@
-Data;Mês;Tipo;Bloco;Categoria;Item;Valor;Observações
-2026-01-05;JAN;Receita;Receitas;Salário;Salário líquido;4800;Exemplo
-2026-01-06;JAN;Despesa;Despesas Fixas;Academia;Mensalidade academia;150;Exemplo
-2026-01-07;JAN;Investimento;Investimentos / Previdência / Reserva;Previdência;Previdência privada;570;Exemplo
+﻿Data,Tipo,Categoria,Item,Valor
+2026-06-02,Despesa,Alimentação,Mercado,250.0
+2026-06-02,Receita,Salário,Salário líquido,4800.0
+2026-06-02,Investimento,Previdência,Previdência privada,570.0
