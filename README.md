@@ -1,34 +1,31 @@
-# Dashboard Financeiro Editável
+# Portal Pessoal — Financeiro & Dieta
 
-Esta versão foi feita para GitHub Pages e permite atualizar o dashboard sem editar código.
+Site estático para GitHub Pages com:
+- dashboard financeiro;
+- lançamentos editáveis;
+- dashboard de dieta;
+- refeições editáveis;
+- importação de planilhas XLSX/CSV;
+- backup JSON;
+- dados salvos no navegador com criptografia.
 
-## Como publicar
+## Arquivos para subir no GitHub
 
-Suba apenas estes arquivos no GitHub:
+Suba todos os arquivos deste pacote na raiz do repositório:
 
 - `index.html`
 - `.nojekyll`
-- `README.md`
+- `modelo_lancamentos_financeiros.xlsx`
+- `modelo_lancamentos_financeiros.csv`
+- `modelo_refeicoes_dieta.xlsx`
+- `modelo_refeicoes_dieta.csv`
 
-Depois ative o GitHub Pages em **Settings > Pages > Deploy from a branch > main > /root**.
+Não coloque planilhas pessoais preenchidas no repositório público.
+Importe seus dados pelo próprio site, depois de fazer login.
 
-## Como atualizar os dados
+## Como atualizar dados
 
 1. Abra o site publicado.
-2. Digite a senha inicial: `Enzo@Financeiro2026`.
-3. Vá em **Importar/Backup**.
-4. Importe uma planilha `.xlsx` ou `.csv` com as colunas:
-   - Mês
-   - Tipo
-   - Bloco
-   - Categoria
-   - Item
-   - Valor
-   - Observações
-5. O dashboard será atualizado automaticamente.
-
-## Importante
-
-Não suba a planilha financeira preenchida em repositório público. Mantenha a planilha no seu computador e importe pelo site quando precisar atualizar.
-
-Os dados importados ficam salvos no navegador usado para acessar o site, de forma criptografada com a senha de acesso. Em outro dispositivo, será necessário importar novamente ou usar um backup.
+2. Entre com a senha.
+3. Use as abas `Lançamentos` e `Refeições`, ou importe arquivos na aba `Importar/Backup`.
+4. Use `Exportar backup` para guardar uma cópia dos dados e migrar para outro navegador.

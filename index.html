@@ -3,36 +3,44 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Dashboard Financeiro Editável</title>
+  <title>Portal Pessoal | Financeiro e Dieta</title>
   <meta name="robots" content="noindex, nofollow" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
     :root {
-      --bg: #07111f;
-      --panel: rgba(15, 23, 42, .74);
-      --panel2: rgba(15, 23, 42, .92);
-      --stroke: rgba(148, 163, 184, .23);
+      --bg: #03050c;
+      --panel: rgba(8, 13, 28, .90);
+      --panel2: rgba(4, 7, 16, .94);
+      --panel3: rgba(15, 23, 42, .74);
+      --stroke: rgba(125, 211, 252, .16);
+      --stroke2: rgba(148, 163, 184, .16);
       --text: #f8fafc;
-      --muted: #9fb0c8;
-      --brand: #38bdf8;
-      --brand2: #a78bfa;
+      --muted: #94a3b8;
+      --muted2: #64748b;
+      --brand: #22d3ee;
+      --brand2: #8b5cf6;
       --good: #22c55e;
       --bad: #fb7185;
       --warn: #f59e0b;
-      --chip: rgba(56,189,248,.11);
-      --shadow: 0 22px 70px rgba(0,0,0,.35);
+      --blue: #60a5fa;
+      --chip: rgba(34, 211, 238, .10);
+      --shadow: 0 28px 90px rgba(0,0,0,.62);
+      --glow: 0 0 0 1px rgba(34,211,238,.08), 0 18px 70px rgba(2,6,23,.75);
+      --radius: 24px;
     }
     * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
     body {
       margin: 0;
       min-height: 100vh;
       color: var(--text);
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background:
-        radial-gradient(circle at 12% 3%, rgba(56, 189, 248, .22), transparent 26rem),
-        radial-gradient(circle at 91% 1%, rgba(167, 139, 250, .18), transparent 30rem),
-        linear-gradient(135deg, #020617 0%, #07111f 48%, #101827 100%);
+        radial-gradient(circle at 12% 0%, rgba(34, 211, 238, .16), transparent 25rem),
+        radial-gradient(circle at 88% 2%, rgba(139, 92, 246, .16), transparent 30rem),
+        radial-gradient(circle at 50% 105%, rgba(14, 165, 233, .08), transparent 38rem),
+        linear-gradient(145deg, #01030a 0%, #03050c 45%, #070b16 100%);
     }
     body::before {
       content: "";
@@ -40,8 +48,8 @@
       inset: 0;
       pointer-events: none;
       background-image:
-        linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+        linear-gradient(rgba(125,211,252,.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(125,211,252,.025) 1px, transparent 1px);
       background-size: 42px 42px;
       mask-image: radial-gradient(circle at center, black, transparent 80%);
     }
@@ -55,16 +63,16 @@
       position: relative;
       z-index: 1;
     }
-    .login-card, .shell-card {
+    .login-card, .card, .nav, .topbar {
       border: 1px solid var(--stroke);
-      border-radius: 28px;
-      background: linear-gradient(145deg, rgba(15,23,42,.88), rgba(15,23,42,.63));
+      background: linear-gradient(145deg, rgba(8,13,28,.94), rgba(5,9,20,.84));
       box-shadow: var(--shadow);
       backdrop-filter: blur(16px);
     }
     .login-card {
-      width: min(480px, 100%);
-      padding: 30px;
+      width: min(520px, 100%);
+      border-radius: 30px;
+      padding: 32px;
     }
     .badge {
       display: inline-flex;
@@ -77,13 +85,13 @@
       background: rgba(56,189,248,.11);
       border: 1px solid rgba(56,189,248,.28);
       font-size: 13px;
-      font-weight: 800;
+      font-weight: 850;
       margin-bottom: 18px;
     }
     h1, h2, h3 { margin: 0; letter-spacing: -0.035em; }
-    h1 { font-size: clamp(30px, 5vw, 45px); line-height: 1.02; }
-    h2 { font-size: clamp(22px, 4vw, 31px); }
-    h3 { font-size: 16px; }
+    h1 { font-size: clamp(32px, 5vw, 50px); line-height: 1.02; }
+    h2 { font-size: clamp(23px, 4vw, 34px); line-height: 1.05; }
+    h3 { font-size: 16px; line-height: 1.25; }
     p { color: var(--muted); line-height: 1.6; margin: 10px 0 0; }
     label { display: block; margin-bottom: 7px; color: #dbeafe; font-size: 13px; font-weight: 800; }
     input, select, textarea {
@@ -92,14 +100,16 @@
       border: 1px solid var(--stroke);
       border-radius: 14px;
       color: var(--text);
-      background: rgba(2, 6, 23, .52);
+      background: rgba(1, 3, 10, .72);
       padding: 12px 13px;
       font-size: 14px;
     }
+    textarea { min-height: 86px; resize: vertical; }
     input:focus, select:focus, textarea:focus {
       border-color: rgba(56,189,248,.75);
       box-shadow: 0 0 0 4px rgba(56,189,248,.10);
     }
+    input[type="file"] { padding: 10px; }
     button, .buttonlike {
       border: 0;
       cursor: pointer;
@@ -131,16 +141,18 @@
     .app {
       position: relative;
       z-index: 1;
-      width: min(1480px, 100%);
+      width: min(1500px, 100%);
       margin: 0 auto;
       padding: 22px;
     }
     header.topbar {
+      border-radius: 26px;
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
       gap: 18px;
-      padding: 18px 0 22px;
+      padding: 20px;
+      margin-bottom: 16px;
     }
     .actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
     .nav {
@@ -148,10 +160,12 @@
       gap: 8px;
       flex-wrap: wrap;
       padding: 8px;
-      border: 1px solid var(--stroke);
       border-radius: 20px;
-      background: rgba(15, 23, 42, .54);
       margin-bottom: 16px;
+      box-shadow: var(--glow);
+      position: sticky;
+      top: 10px;
+      z-index: 10;
     }
     .tab {
       color: #cbd5e1;
@@ -167,33 +181,34 @@
     }
     .grid { display: grid; gap: 16px; }
     .grid.kpi { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-    .grid.two { grid-template-columns: minmax(0, 1.35fr) minmax(320px, .65fr); }
+    .grid.two { grid-template-columns: minmax(0, 1.25fr) minmax(320px, .75fr); }
     .grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .grid.form { grid-template-columns: repeat(4, minmax(160px, 1fr)); align-items: end; }
     .card {
-      border: 1px solid var(--stroke);
-      border-radius: 24px;
+      border-radius: var(--radius);
       padding: 18px;
-      background: var(--panel);
-      box-shadow: 0 16px 55px rgba(0,0,0,.18);
-      backdrop-filter: blur(14px);
+      box-shadow: var(--glow);
     }
-    .kpi-card { min-height: 126px; display: flex; flex-direction: column; justify-content: space-between; }
+    .section-title { display:flex; justify-content:space-between; gap:12px; align-items:flex-start; margin-bottom:14px; }
+    .kpi-card { min-height: 132px; display: flex; flex-direction: column; justify-content: space-between; }
     .kpi-card .label { color: var(--muted); font-size: 13px; font-weight: 800; }
     .kpi-card .value { font-size: clamp(24px, 3vw, 36px); font-weight: 950; letter-spacing: -0.055em; margin-top: 8px; }
     .kpi-card .sub { color: var(--muted); font-size: 12px; margin-top: 8px; }
     .value.good { color: #86efac; }
     .value.bad { color: #fda4af; }
+    .value.warn { color: #fcd34d; }
     .toolbar { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; margin-bottom: 14px; }
     .field { min-width: 160px; flex: 1; }
+    .field.tiny { min-width: 120px; max-width: 150px; }
     .field.small-field { max-width: 180px; }
-    .table-wrap { overflow: auto; border-radius: 18px; border: 1px solid var(--stroke); background: rgba(2,6,23,.28); }
-    table { width: 100%; border-collapse: collapse; min-width: 850px; }
+    .table-wrap { overflow: auto; border-radius: 18px; border: 1px solid var(--stroke); background: rgba(1,3,10,.54); }
+    table { width: 100%; border-collapse: collapse; min-width: 940px; }
     th, td { padding: 12px 12px; border-bottom: 1px solid rgba(148, 163, 184, .14); text-align: left; vertical-align: middle; }
-    th { color: #c4d2ea; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; background: rgba(15,23,42,.82); position: sticky; top: 0; z-index: 1; }
+    th { color: #c4d2ea; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; background: rgba(5,9,20,.96); position: sticky; top: 0; z-index: 1; }
     td { color: #e2e8f0; font-size: 13px; }
-    tr:hover td { background: rgba(56,189,248,.04); }
+    tr:hover td { background: rgba(34,211,238,.06); }
     td input, td select { min-width: 130px; padding: 9px 10px; }
-    td .money-input { min-width: 110px; }
+    td .money-input, td .num-input { min-width: 100px; }
     .pill {
       display: inline-flex;
       padding: 5px 9px;
@@ -204,304 +219,442 @@
       font-size: 12px;
       font-weight: 800;
     }
+    .pill.good { color:#bbf7d0; background:rgba(34,197,94,.12); border-color:rgba(34,197,94,.22); }
+    .pill.bad { color:#fecdd3; background:rgba(251,113,133,.12); border-color:rgba(251,113,133,.22); }
+    .pill.warn { color:#fde68a; background:rgba(245,158,11,.12); border-color:rgba(245,158,11,.22); }
     .empty {
       padding: 34px;
       text-align: center;
       color: var(--muted);
       border: 1px dashed var(--stroke);
       border-radius: 20px;
-      background: rgba(2,6,23,.22);
+      background: rgba(1,3,10,.48);
     }
     .notice {
       border: 1px solid rgba(245, 158, 11, .30);
       background: rgba(245, 158, 11, .10);
       color: #fde68a;
+      padding: 14px;
       border-radius: 18px;
-      padding: 14px 16px;
-      margin-top: 12px;
-      line-height: 1.55;
+      margin-bottom: 14px;
+      line-height: 1.5;
+      font-size: 13px;
     }
     .success {
-      border-color: rgba(34,197,94,.30);
-      background: rgba(34,197,94,.10);
+      border: 1px solid rgba(34, 197, 94, .30);
+      background: rgba(34, 197, 94, .10);
       color: #bbf7d0;
+      padding: 14px;
+      border-radius: 18px;
+      margin-bottom: 14px;
+      line-height: 1.5;
+      font-size: 13px;
     }
-    .danger-note {
-      border-color: rgba(251,113,133,.30);
-      background: rgba(251,113,133,.10);
-      color: #fecdd3;
-    }
-    .chart-box { height: 340px; }
-    .mini-chart { height: 295px; }
-    .status-line { color: #9fb0c8; font-size: 12px; margin-top: 8px; }
-    .right { text-align: right; }
-    .split { display: flex; justify-content: space-between; gap: 14px; align-items: center; }
     .filebox {
-      border: 1px dashed rgba(148,163,184,.35);
-      border-radius: 22px;
-      padding: 18px;
-      background: rgba(2,6,23,.24);
+      border: 1px dashed rgba(125,211,252,.30);
+      background: rgba(1,3,10,.36);
+      border-radius: 20px;
+      padding: 16px;
     }
-    footer { color: var(--muted); font-size: 12px; padding: 20px 0; }
-    @media (max-width: 980px) {
-      .grid.kpi, .grid.two, .grid.three { grid-template-columns: 1fr; }
+    .status-line { color: var(--muted); font-size: 12px; margin-top: 10px; }
+    .chartbox { height: 320px; position: relative; }
+    .chartbox.small { height: 260px; }
+    .mini-list { display: grid; gap: 10px; margin-top: 10px; }
+    .mini-row { display:flex; justify-content:space-between; align-items:center; gap:12px; padding: 11px 0; border-bottom: 1px solid rgba(148,163,184,.12); }
+    .mini-row:last-child { border-bottom:0; }
+    .mini-row strong { font-size: 13px; }
+    .mini-row span { color: var(--muted); font-size: 12px; }
+    .divider { height:1px; background:rgba(148,163,184,.14); margin: 16px 0; }
+    code {
+      display: inline-block;
+      color: #bae6fd;
+      background: rgba(56,189,248,.10);
+      border: 1px solid rgba(56,189,248,.18);
+      padding: 2px 6px;
+      border-radius: 8px;
+      font-size: 12px;
+    }
+    .template-links { display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
+    @media (max-width: 1080px) {
+      .grid.kpi, .grid.three, .grid.two, .grid.form { grid-template-columns: 1fr 1fr; }
       header.topbar { flex-direction: column; }
-      .actions { justify-content: flex-start; }
-      .login-row { flex-direction: column; }
-      .app { padding: 14px; }
-      .card { border-radius: 20px; }
+      .actions { justify-content:flex-start; }
+    }
+    @media (max-width: 720px) {
+      .app { padding: 12px; }
+      .login-card { padding: 24px; }
+      .login-row, .toolbar, .section-title { flex-direction: column; align-items: stretch; }
+      .grid.kpi, .grid.three, .grid.two, .grid.form { grid-template-columns: 1fr; }
+      button, .buttonlike { width: 100%; }
+      .field.small-field, .field.tiny { max-width: none; }
+      .nav { position: static; }
     }
   </style>
 </head>
 <body>
-  <section id="login" class="login-wrap">
-    <div class="login-card">
-      <div class="badge">🔐 Dashboard financeiro editável</div>
-      <h1>Entre para acessar seus dados</h1>
-      <p>Depois de entrar, você poderá importar uma planilha, editar lançamentos no próprio site e ver o dashboard atualizar na hora.</p>
+  <main id="login" class="login-wrap">
+    <section class="login-card">
+      <div class="badge">🔐 Portal pessoal privado</div>
+      <h1>Entre para acessar seus dashboards</h1>
+      <p>Depois de entrar, você poderá controlar o financeiro, registrar dieta, importar planilhas e ver os gráficos atualizarem automaticamente.</p>
       <div class="login-row">
-        <div style="flex: 1;">
+        <div style="flex:1;">
           <label for="password">Senha</label>
           <input id="password" type="password" placeholder="Digite sua senha" autocomplete="current-password" />
         </div>
-        <button id="loginBtn" style="align-self: end;">Entrar</button>
+        <div style="display:flex; align-items:end;">
+          <button id="loginBtn">Entrar</button>
+        </div>
       </div>
       <div id="loginError" class="error"></div>
-      <div class="hint">Senha inicial: <strong>Enzo@Financeiro2026</strong>. Os dados importados ficam salvos no navegador, de forma criptografada com essa senha.</div>
-    </div>
-  </section>
+      <div class="hint">Os dados ficam salvos apenas neste navegador, criptografados com a senha usada no acesso.</div>
+    </section>
+  </main>
 
   <main id="app" class="app hidden">
     <header class="topbar">
       <div>
-        <div class="badge">📊 Painel pessoal</div>
-        <h1>Dashboard Financeiro</h1>
-        <p>Edite seus gastos, receitas e investimentos no próprio site ou importe uma planilha Excel/CSV.</p>
-        <div id="lastSaved" class="status-line"></div>
+        <div class="badge">⚡ Portal Pessoal Enzo</div>
+        <h1>Financeiro & Dieta</h1>
+        <p>Um painel único para acompanhar gastos, receitas, refeições, macros e evolução diária.</p>
       </div>
       <div class="actions">
-        <button class="secondary" id="saveBtn">Salvar agora</button>
-        <button class="secondary" id="exportCsvTopBtn">Exportar CSV</button>
-        <button class="danger" id="logoutBtn">Sair</button>
+        <button id="saveNowBtn" class="secondary">Salvar agora</button>
+        <button id="exportBackupBtn" class="secondary">Exportar backup</button>
+        <button id="logoutBtn" class="danger">Sair</button>
       </div>
     </header>
 
     <nav class="nav">
-      <button class="tab active" data-tab="dashboard">Dashboard</button>
+      <button class="tab active" data-tab="visao">Visão geral</button>
+      <button class="tab" data-tab="financeiro">Dashboard financeiro</button>
       <button class="tab" data-tab="lancamentos">Lançamentos</button>
+      <button class="tab" data-tab="dieta">Dashboard dieta</button>
+      <button class="tab" data-tab="refeicoes">Refeições</button>
       <button class="tab" data-tab="importar">Importar/Backup</button>
       <button class="tab" data-tab="ajuda">Como usar</button>
     </nav>
 
-    <section id="dashboard" class="tab-panel">
-      <div class="toolbar">
-        <div class="field small-field">
-          <label>Mês</label>
-          <select id="monthFilter"><option value="TODOS">Ano todo</option></select>
-        </div>
-        <div class="field small-field">
-          <label>Tipo</label>
-          <select id="typeFilter"><option value="TODOS">Todos</option><option>Receita</option><option>Despesa</option><option>Investimento</option></select>
-        </div>
-        <div class="field">
-          <label>Buscar</label>
-          <input id="dashSearch" placeholder="Ex.: academia, carro, salário..." />
-        </div>
-      </div>
-
+    <section id="visao" class="tab-panel">
       <div class="grid kpi">
-        <div class="card kpi-card"><div><div class="label">Receitas</div><div id="kpiReceitas" class="value good">R$ 0</div></div><div id="subReceitas" class="sub"></div></div>
-        <div class="card kpi-card"><div><div class="label">Despesas</div><div id="kpiDespesas" class="value bad">R$ 0</div></div><div id="subDespesas" class="sub"></div></div>
-        <div class="card kpi-card"><div><div class="label">Investimentos</div><div id="kpiInvest" class="value">R$ 0</div></div><div id="subInvest" class="sub"></div></div>
-        <div class="card kpi-card"><div><div class="label">Resultado</div><div id="kpiResultado" class="value">R$ 0</div></div><div id="subResultado" class="sub"></div></div>
+        <div class="card kpi-card">
+          <div><div class="label">Resultado financeiro</div><div id="kpiVisaoResultado" class="value">R$ 0,00</div></div>
+          <div class="sub">Receitas - despesas - investimentos</div>
+        </div>
+        <div class="card kpi-card">
+          <div><div class="label">Saldo acumulado</div><div id="kpiVisaoSaldo" class="value">R$ 0,00</div></div>
+          <div class="sub">Soma dos resultados mensais</div>
+        </div>
+        <div class="card kpi-card">
+          <div><div class="label">Calorias hoje</div><div id="kpiVisaoCalorias" class="value">0 kcal</div></div>
+          <div class="sub">Baseado na data atual</div>
+        </div>
+        <div class="card kpi-card">
+          <div><div class="label">Proteína hoje</div><div id="kpiVisaoProteina" class="value">0 g</div></div>
+          <div class="sub">Soma das refeições do dia</div>
+        </div>
       </div>
-
       <div class="grid two" style="margin-top:16px;">
         <div class="card">
-          <div class="split"><h2>Fluxo mensal</h2><span class="pill" id="recordCount">0 lançamentos</span></div>
-          <p>Receitas, saídas e resultado por mês.</p>
-          <div class="chart-box"><canvas id="monthlyChart"></canvas></div>
-        </div>
-        <div class="card">
-          <h2>Composição das saídas</h2>
-          <p>Distribuição por categoria, considerando despesas e investimentos.</p>
-          <div class="mini-chart"><canvas id="categoryChart"></canvas></div>
-        </div>
-      </div>
-
-      <div class="grid two" style="margin-top:16px;">
-        <div class="card">
-          <h2>Resumo por mês</h2>
-          <div class="table-wrap" style="margin-top:14px;">
-            <table id="monthlyTable"></table>
+          <div class="section-title">
+            <div><h2>Resumo financeiro mensal</h2><p>Entradas, saídas e resultado por mês.</p></div>
           </div>
+          <div class="chartbox"><canvas id="visaoFinanceChart"></canvas></div>
         </div>
         <div class="card">
-          <h2>Alertas</h2>
-          <div id="alerts" style="margin-top:14px;"></div>
+          <div class="section-title">
+            <div><h2>Resumo de dieta</h2><p>Calorias e proteína dos últimos dias lançados.</p></div>
+          </div>
+          <div class="chartbox"><canvas id="visaoDietChart"></canvas></div>
         </div>
+      </div>
+      <div class="grid two" style="margin-top:16px;">
+        <div class="card">
+          <h3>Próximos alertas financeiros</h3>
+          <div id="financeAlerts" class="mini-list"></div>
+        </div>
+        <div class="card">
+          <h3>Resumo de hoje</h3>
+          <div id="todayDietList" class="mini-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="financeiro" class="tab-panel hidden">
+      <div class="toolbar">
+        <div class="field small-field"><label>Mês</label><select id="financeMonthFilter"><option value="TODOS">Todos</option></select></div>
+        <button id="addFinanceSampleBtn" class="secondary">Adicionar exemplos</button>
+      </div>
+      <div class="grid kpi">
+        <div class="card kpi-card">
+          <div><div class="label">Receitas</div><div id="kpiReceitas" class="value good">R$ 0,00</div></div>
+          <div class="sub">Total do filtro selecionado</div>
+        </div>
+        <div class="card kpi-card">
+          <div><div class="label">Despesas</div><div id="kpiDespesas" class="value bad">R$ 0,00</div></div>
+          <div class="sub">Gastos fixos e variáveis</div>
+        </div>
+        <div class="card kpi-card">
+          <div><div class="label">Investimentos</div><div id="kpiInvestimentos" class="value warn">R$ 0,00</div></div>
+          <div class="sub">Reserva, previdência e aplicações</div>
+        </div>
+        <div class="card kpi-card">
+          <div><div class="label">Resultado</div><div id="kpiResultado" class="value">R$ 0,00</div></div>
+          <div class="sub">Receitas - saídas</div>
+        </div>
+      </div>
+      <div class="grid two" style="margin-top:16px;">
+        <div class="card">
+          <div class="section-title">
+            <div><h2>Fluxo mensal</h2><p>Receitas, despesas, investimentos e resultado.</p></div>
+          </div>
+          <div class="chartbox"><canvas id="financeMonthlyChart"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="section-title">
+            <div><h2>Composição das saídas</h2><p>Principais categorias de despesa e investimento.</p></div>
+          </div>
+          <div class="chartbox"><canvas id="financeCategoryChart"></canvas></div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:16px;">
+        <div class="section-title">
+          <div><h2>Resumo por mês</h2><p>Tabela calculada automaticamente.</p></div>
+        </div>
+        <div class="table-wrap"><table id="financeMonthlyTable"></table></div>
       </div>
     </section>
 
     <section id="lancamentos" class="tab-panel hidden">
       <div class="card">
-        <div class="split">
-          <div>
-            <h2>Lançamentos</h2>
-            <p>Adicione, edite ou exclua dados. O dashboard atualiza automaticamente.</p>
+        <div class="section-title">
+          <div><h2>Novo lançamento financeiro</h2><p>Inclua receitas, despesas e investimentos sem mexer no código.</p></div>
+        </div>
+        <div class="grid form">
+          <div><label>Data</label><input id="finData" type="date" /></div>
+          <div><label>Mês</label><select id="finMes"></select></div>
+          <div><label>Tipo</label><select id="finTipo"><option>Receita</option><option>Despesa</option><option>Investimento</option></select></div>
+          <div><label>Bloco</label><select id="finBloco"></select></div>
+          <div><label>Categoria</label><input id="finCategoria" placeholder="Ex.: Alimentação" /></div>
+          <div><label>Item</label><input id="finItem" placeholder="Ex.: Mercado" /></div>
+          <div><label>Valor</label><input id="finValor" type="number" step="0.01" placeholder="0.00" /></div>
+          <div><button id="addFinanceBtn">Adicionar lançamento</button></div>
+        </div>
+        <div style="margin-top:12px;"><label>Observações</label><input id="finObs" placeholder="Opcional" /></div>
+      </div>
+
+      <div class="card" style="margin-top:16px;">
+        <div class="section-title">
+          <div><h2>Editar lançamentos financeiros</h2><p>Altere os valores direto na tabela. O dashboard atualiza automaticamente.</p></div>
+        </div>
+        <div class="toolbar">
+          <div class="field small-field"><label>Mês</label><select id="financeTableMonth"><option value="TODOS">Todos</option></select></div>
+          <div class="field small-field"><label>Tipo</label><select id="financeTableType"><option value="TODOS">Todos</option><option>Receita</option><option>Despesa</option><option>Investimento</option></select></div>
+          <div class="field"><label>Buscar</label><input id="financeSearch" placeholder="Pesquisar categoria, item ou bloco..." /></div>
+        </div>
+        <div class="table-wrap"><table id="financeRecordsTable"></table></div>
+        <div id="financeTableStatus" class="status-line"></div>
+      </div>
+    </section>
+
+    <section id="dieta" class="tab-panel hidden">
+      <div class="toolbar">
+        <div class="field small-field"><label>Data</label><input id="dietDateFilter" type="date" /></div>
+        <button id="clearDietDateBtn" class="secondary">Ver tudo</button>
+        <button id="addDietSampleBtn" class="secondary">Adicionar exemplos</button>
+      </div>
+      <div class="grid kpi">
+        <div class="card kpi-card">
+          <div><div class="label">Calorias</div><div id="kpiCalories" class="value">0 kcal</div></div>
+          <div class="sub">Total do filtro selecionado</div>
+        </div>
+        <div class="card kpi-card">
+          <div><div class="label">Proteína</div><div id="kpiProtein" class="value good">0 g</div></div>
+          <div class="sub">Soma das refeições</div>
+        </div>
+        <div class="card kpi-card">
+          <div><div class="label">Carboidratos</div><div id="kpiCarbs" class="value">0 g</div></div>
+          <div class="sub">Soma dos alimentos</div>
+        </div>
+        <div class="card kpi-card">
+          <div><div class="label">Água</div><div id="kpiWater" class="value">0 L</div></div>
+          <div class="sub">Total informado no dia/filtro</div>
+        </div>
+      </div>
+      <div class="grid two" style="margin-top:16px;">
+        <div class="card">
+          <div class="section-title">
+            <div><h2>Calorias por dia</h2><p>Evolução baseada nas refeições lançadas.</p></div>
           </div>
-          <button id="addRowBtn">Adicionar lançamento</button>
+          <div class="chartbox"><canvas id="dietCaloriesChart"></canvas></div>
         </div>
-        <div class="toolbar" style="margin-top:14px;">
-          <div class="field small-field"><label>Mês</label><select id="tableMonth"><option value="TODOS">Todos</option></select></div>
-          <div class="field small-field"><label>Tipo</label><select id="tableType"><option value="TODOS">Todos</option><option>Receita</option><option>Despesa</option><option>Investimento</option></select></div>
-          <div class="field"><label>Buscar</label><input id="tableSearch" placeholder="Pesquisar por categoria, item, bloco..." /></div>
+        <div class="card">
+          <div class="section-title">
+            <div><h2>Macros</h2><p>Proteína, carboidratos e gordura.</p></div>
+          </div>
+          <div class="chartbox"><canvas id="dietMacroChart"></canvas></div>
         </div>
-        <div class="table-wrap">
-          <table id="recordsTable"></table>
+      </div>
+      <div class="card" style="margin-top:16px;">
+        <div class="section-title">
+          <div><h2>Resumo por refeição</h2><p>Distribuição de calorias por café, almoço, jantar e lanches.</p></div>
         </div>
-        <div id="tableStatus" class="status-line"></div>
+        <div class="table-wrap"><table id="mealSummaryTable"></table></div>
+      </div>
+    </section>
+
+    <section id="refeicoes" class="tab-panel hidden">
+      <div class="card">
+        <div class="section-title">
+          <div><h2>Nova refeição</h2><p>Cadastre cada alimento ou uma refeição completa.</p></div>
+        </div>
+        <div class="grid form">
+          <div><label>Data</label><input id="dietData" type="date" /></div>
+          <div><label>Refeição</label><select id="dietMeal"></select></div>
+          <div><label>Alimento</label><input id="dietFood" placeholder="Ex.: Frango" /></div>
+          <div><label>Quantidade</label><input id="dietQty" placeholder="Ex.: 150g" /></div>
+          <div><label>Calorias</label><input id="dietCalories" type="number" step="1" placeholder="0" /></div>
+          <div><label>Proteína (g)</label><input id="dietProtein" type="number" step="0.1" placeholder="0" /></div>
+          <div><label>Carbo (g)</label><input id="dietCarbs" type="number" step="0.1" placeholder="0" /></div>
+          <div><label>Gordura (g)</label><input id="dietFat" type="number" step="0.1" placeholder="0" /></div>
+          <div><label>Água (ml)</label><input id="dietWater" type="number" step="50" placeholder="0" /></div>
+          <div style="grid-column: span 2;"><label>Observações</label><input id="dietObs" placeholder="Opcional" /></div>
+          <div><button id="addDietBtn">Adicionar refeição</button></div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:16px;">
+        <div class="section-title">
+          <div><h2>Editar refeições</h2><p>Edite direto na tabela. Os gráficos são recalculados na hora.</p></div>
+        </div>
+        <div class="toolbar">
+          <div class="field small-field"><label>Data</label><input id="dietTableDate" type="date" /></div>
+          <div class="field small-field"><label>Refeição</label><select id="dietTableMeal"><option value="TODOS">Todas</option></select></div>
+          <div class="field"><label>Buscar</label><input id="dietSearch" placeholder="Pesquisar alimento, quantidade ou observação..." /></div>
+        </div>
+        <div class="table-wrap"><table id="dietRecordsTable"></table></div>
+        <div id="dietTableStatus" class="status-line"></div>
       </div>
     </section>
 
     <section id="importar" class="tab-panel hidden">
+      <div class="notice">
+        <strong>Atenção:</strong> importar planilhas pelo site salva os dados só no navegador usado agora. Para levar para outro computador, use “Exportar backup” e depois “Importar backup”.
+      </div>
       <div class="grid two">
         <div class="card">
-          <h2>Importar planilha</h2>
-          <p>Use Excel <strong>.xlsx</strong> ou CSV com as colunas: Mês, Tipo, Bloco, Categoria, Item e Valor.</p>
-          <div class="filebox" style="margin-top:14px;">
-            <label for="fileInput">Escolher arquivo</label>
-            <input id="fileInput" type="file" accept=".xlsx,.xls,.csv" />
-            <div class="toolbar" style="margin-top:12px;">
-              <button id="replaceImportBtn">Importar substituindo tudo</button>
-              <button class="secondary" id="mergeImportBtn">Importar somando aos atuais</button>
+          <h2>Importar financeiro</h2>
+          <p>Use a planilha modelo ou um CSV com colunas parecidas.</p>
+          <div class="template-links">
+            <a class="buttonlike secondary" href="modelo_lancamentos_financeiros.xlsx" download>Baixar modelo XLSX</a>
+            <a class="buttonlike secondary" href="modelo_lancamentos_financeiros.csv" download>Baixar modelo CSV</a>
+          </div>
+          <div class="divider"></div>
+          <div class="filebox">
+            <label>Arquivo financeiro .xlsx ou .csv</label>
+            <input id="financeImportFile" type="file" accept=".xlsx,.csv" />
+            <div class="toolbar" style="margin-top:12px;margin-bottom:0;">
+              <button id="importFinanceReplaceBtn">Substituir financeiro</button>
+              <button id="importFinanceAppendBtn" class="secondary">Adicionar ao financeiro</button>
             </div>
-            <div id="importStatus" class="status-line"></div>
           </div>
-          <div class="notice">Dica: mantenha sua planilha de lançamentos no computador. Quando quiser atualizar o site, importe o arquivo novamente.</div>
         </div>
-
         <div class="card">
-          <h2>Backup e exportação</h2>
-          <p>Baixe uma cópia dos dados salvos no navegador para guardar ou editar em Excel.</p>
-          <div class="toolbar" style="margin-top:14px;">
-            <button id="exportCsvBtn">Exportar CSV</button>
-            <button class="secondary" id="exportJsonBtn">Exportar backup JSON</button>
-            <button class="secondary" id="exportXlsxBtn">Exportar XLSX</button>
+          <h2>Importar dieta</h2>
+          <p>Use o modelo de refeições para controlar calorias, macros e água.</p>
+          <div class="template-links">
+            <a class="buttonlike secondary" href="modelo_refeicoes_dieta.xlsx" download>Baixar modelo XLSX</a>
+            <a class="buttonlike secondary" href="modelo_refeicoes_dieta.csv" download>Baixar modelo CSV</a>
           </div>
-          <div class="notice success">Os dados do dashboard ficam no navegador em que você usou o site. Em outro computador/celular, importe o backup ou a planilha novamente.</div>
-          <div class="notice danger-note">Não suba sua planilha financeira preenchida no GitHub público. Suba apenas os arquivos do site.</div>
-          <button class="danger" id="clearBtn" style="margin-top:14px;">Limpar todos os dados deste navegador</button>
+          <div class="divider"></div>
+          <div class="filebox">
+            <label>Arquivo de dieta .xlsx ou .csv</label>
+            <input id="dietImportFile" type="file" accept=".xlsx,.csv" />
+            <div class="toolbar" style="margin-top:12px;margin-bottom:0;">
+              <button id="importDietReplaceBtn">Substituir dieta</button>
+              <button id="importDietAppendBtn" class="secondary">Adicionar à dieta</button>
+            </div>
+          </div>
         </div>
       </div>
+      <div class="grid two" style="margin-top:16px;">
+        <div class="card">
+          <h2>Backup completo</h2>
+          <p>Exporte ou importe um arquivo JSON com financeiro e dieta juntos.</p>
+          <div class="toolbar" style="margin-top:12px;">
+            <button id="exportJsonBtn">Exportar backup JSON</button>
+            <button id="importJsonBtn" class="secondary">Importar backup JSON</button>
+            <input id="jsonImportFile" class="hidden" type="file" accept=".json" />
+          </div>
+        </div>
+        <div class="card">
+          <h2>Área de risco</h2>
+          <p>Apague os dados salvos neste navegador.</p>
+          <div class="toolbar" style="margin-top:12px;">
+            <button id="clearFinanceBtn" class="danger">Limpar financeiro</button>
+            <button id="clearDietBtn" class="danger">Limpar dieta</button>
+            <button id="clearAllBtn" class="danger">Limpar tudo</button>
+          </div>
+        </div>
+      </div>
+      <div id="importStatus" class="status-line"></div>
     </section>
 
     <section id="ajuda" class="tab-panel hidden">
       <div class="grid two">
         <div class="card">
-          <h2>Melhor jeito de usar</h2>
-          <p>Esta versão foi pensada para não precisar editar código no GitHub. Você publica o site uma vez e depois atualiza os dados pelo próprio dashboard.</p>
-          <div class="notice success"><strong>Fluxo recomendado:</strong><br>1. Publique este site no GitHub Pages.<br>2. Abra o site e digite a senha.<br>3. Importe a planilha de lançamentos.<br>4. Edite dados na aba Lançamentos ou reimporte uma planilha atualizada.</div>
+          <h2>Como atualizar seus dados</h2>
+          <p>O jeito mais fácil é usar as abas <strong>Lançamentos</strong> e <strong>Refeições</strong>. Você edita na tabela, salva e o dashboard recalcula sozinho.</p>
+          <div class="divider"></div>
+          <div class="mini-list">
+            <div class="mini-row"><strong>Financeiro</strong><span>Receitas, despesas, investimentos e categorias</span></div>
+            <div class="mini-row"><strong>Dieta</strong><span>Refeições, calorias, macros e água</span></div>
+            <div class="mini-row"><strong>Importar</strong><span>Substituir ou somar dados por planilha</span></div>
+            <div class="mini-row"><strong>Backup</strong><span>Levar dados para outro navegador/computador</span></div>
+          </div>
         </div>
         <div class="card">
-          <h2>Formato da planilha</h2>
-          <p>O importador aceita estes cabeçalhos:</p>
-          <div class="table-wrap" style="margin-top:14px;">
-            <table>
-              <thead><tr><th>Coluna</th><th>Exemplo</th></tr></thead>
-              <tbody>
-                <tr><td>Mês</td><td>JAN</td></tr>
-                <tr><td>Tipo</td><td>Despesa</td></tr>
-                <tr><td>Bloco</td><td>Despesas Fixas</td></tr>
-                <tr><td>Categoria</td><td>Carro</td></tr>
-                <tr><td>Item</td><td>Seguro do carro</td></tr>
-                <tr><td>Valor</td><td>280</td></tr>
-              </tbody>
-            </table>
-          </div>
+          <h2>Formato das planilhas</h2>
+          <p>Use os modelos que deixei na aba Importar. Para valores, use número puro, sem <code>R$</code>. Para centavos, use ponto ou vírgula.</p>
+          <div class="divider"></div>
+          <p><strong>Financeiro:</strong> Data, Mês, Tipo, Bloco, Categoria, Item, Valor, Observações.</p>
+          <p><strong>Dieta:</strong> Data, Refeição, Alimento, Quantidade, Calorias, Proteína, Carboidrato, Gordura, Água ml, Observações.</p>
         </div>
       </div>
     </section>
-
-    <footer>
-      Dashboard estático para GitHub Pages. Dados salvos localmente no navegador e criptografados com a senha de acesso.
-    </footer>
   </main>
 
   <script>
     const PASSWORD_HASH = "372ead080f3fb91706fa98dd8f779081f8189edd5a838b285cc968c025128187";
-    const STORAGE_KEY = "financeDashboardEncryptedRecordsV2";
-    const SALT_TEXT = "dashboard-financeiro-editavel-enzo-v2";
+    const STORAGE_KEY = "portalPessoalEnzoEncryptedV1";
+    const SALT_TEXT = "portal-pessoal-enzo-financeiro-dieta-v1";
     const MONTHS = ["JAN","FEV","MAR","ABRIL","MAIO","JUN","JUL","AGO","SET","OUT","NOV","DEZ"];
-    const TYPES = ["Receita", "Despesa", "Investimento"];
-    const BLOCKS = ["Receitas", "Despesas Fixas", "Despesas Variáveis", "Despesas Extras", "Investimentos / Previdência / Reserva"];
-    let records = [];
-    let cryptoKey = null;
-    let pendingImport = null;
-    let monthlyChart = null;
-    let categoryChart = null;
+    const FIN_TYPES = ["Receita", "Despesa", "Investimento"];
+    const FIN_BLOCKS = ["Receitas", "Despesas Fixas", "Despesas Variáveis", "Despesas Extras", "Investimentos / Previdência / Reserva"];
+    const MEALS = ["Café da manhã", "Almoço", "Lanche", "Pré-treino", "Pós-treino", "Jantar", "Ceia", "Outro"];
 
+    let state = { finance: [], diet: [] };
+    let cryptoKey = null;
+    let charts = {};
     const $ = (id) => document.getElementById(id);
     const enc = new TextEncoder();
     const dec = new TextDecoder();
 
-    function money(value) {
-      const n = Number(value || 0);
-      return n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-    }
-    function uid() {
-      return Date.now().toString(36) + Math.random().toString(36).slice(2, 9);
-    }
-    function normalizeText(v) {
-      return String(v ?? "").trim();
-    }
-    function stripAccents(s) {
-      return normalizeText(s).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-    }
-    function normalizeMonth(v) {
-      const raw = stripAccents(v).replace("ç", "c");
-      const map = {
-        "jan": "JAN", "janeiro": "JAN", "1": "JAN", "01": "JAN",
-        "fev": "FEV", "fevereiro": "FEV", "2": "FEV", "02": "FEV",
-        "mar": "MAR", "marco": "MAR", "março": "MAR", "3": "MAR", "03": "MAR",
-        "abr": "ABRIL", "abril": "ABRIL", "4": "ABRIL", "04": "ABRIL",
-        "mai": "MAIO", "maio": "MAIO", "5": "MAIO", "05": "MAIO",
-        "jun": "JUN", "junho": "JUN", "6": "JUN", "06": "JUN",
-        "jul": "JUL", "julho": "JUL", "7": "JUL", "07": "JUL",
-        "ago": "AGO", "agosto": "AGO", "8": "AGO", "08": "AGO",
-        "set": "SET", "setembro": "SET", "9": "SET", "09": "SET",
-        "out": "OUT", "outubro": "OUT", "10": "OUT",
-        "nov": "NOV", "novembro": "NOV", "11": "NOV",
-        "dez": "DEZ", "dezembro": "DEZ", "12": "DEZ"
-      };
-      const key = raw.toUpperCase();
-      if (MONTHS.includes(key)) return key;
-      return map[raw] || "JAN";
-    }
-    function normalizeType(v) {
-      const s = stripAccents(v);
-      if (s.includes("receita") || s.includes("entrada")) return "Receita";
-      if (s.includes("invest" ) || s.includes("previd" ) || s.includes("reserva")) return "Investimento";
-      return "Despesa";
-    }
-    function parseMoney(v) {
-      if (typeof v === "number") return Math.abs(v);
-      let s = String(v ?? "").trim();
-      if (!s) return 0;
-      s = s.replace(/R\$|\s/g, "");
-      if (s.includes(",")) s = s.replace(/\./g, "").replace(",", ".");
-      s = s.replace(/[^0-9.-]/g, "");
-      const n = parseFloat(s);
-      return Number.isFinite(n) ? Math.abs(n) : 0;
-    }
+    const todayISO = () => new Date().toISOString().slice(0,10);
+    const uid = () => (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2));
+    const stripAccents = (s) => String(s ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+    const norm = (s) => stripAccents(s).toLowerCase();
+    const money = (value) => Number(value || 0).toLocaleString("pt-BR", {style:"currency", currency:"BRL"});
+    const num = (value, digits=0) => Number(value || 0).toLocaleString("pt-BR", {maximumFractionDigits:digits, minimumFractionDigits:digits});
+    const escapeHtml = (s) => String(s ?? "").replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+
     async function sha256Hex(text) {
       const hash = await crypto.subtle.digest("SHA-256", enc.encode(text));
-      return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, "0")).join("");
+      return [...new Uint8Array(hash)].map(b => b.toString(16).padStart(2, "0")).join("");
     }
     async function deriveKey(password) {
       const material = await crypto.subtle.importKey("raw", enc.encode(password), "PBKDF2", false, ["deriveKey"]);
       return crypto.subtle.deriveKey(
-        { name: "PBKDF2", salt: enc.encode(SALT_TEXT), iterations: 150000, hash: "SHA-256" },
+        { name: "PBKDF2", salt: enc.encode(SALT_TEXT), iterations: 250000, hash: "SHA-256" },
         material,
         { name: "AES-GCM", length: 256 },
         false,
@@ -510,390 +663,554 @@
     }
     function b64(bytes) { return btoa(String.fromCharCode(...new Uint8Array(bytes))); }
     function fromB64(str) { return Uint8Array.from(atob(str), c => c.charCodeAt(0)); }
+
     async function saveEncrypted() {
       if (!cryptoKey) return;
       const iv = crypto.getRandomValues(new Uint8Array(12));
-      const plaintext = enc.encode(JSON.stringify(records));
+      const plaintext = enc.encode(JSON.stringify(state));
       const ciphertext = await crypto.subtle.encrypt({ name: "AES-GCM", iv }, cryptoKey, plaintext);
       localStorage.setItem(STORAGE_KEY, JSON.stringify({ iv: b64(iv), data: b64(ciphertext), updatedAt: new Date().toISOString() }));
-      updateSavedLabel();
     }
     async function loadEncrypted() {
       const payload = localStorage.getItem(STORAGE_KEY);
-      if (!payload) return [];
+      if (!payload) return { finance: [], diet: [] };
       const parsed = JSON.parse(payload);
       const decrypted = await crypto.subtle.decrypt({ name: "AES-GCM", iv: fromB64(parsed.iv) }, cryptoKey, fromB64(parsed.data));
-      return JSON.parse(dec.decode(decrypted));
-    }
-    function updateSavedLabel() {
-      const payload = localStorage.getItem(STORAGE_KEY);
-      if (!payload) { $("lastSaved").textContent = "Nenhum dado salvo ainda."; return; }
-      try {
-        const p = JSON.parse(payload);
-        const date = new Date(p.updatedAt);
-        $("lastSaved").textContent = "Último salvamento: " + date.toLocaleString("pt-BR");
-      } catch { $("lastSaved").textContent = "Dados salvos neste navegador."; }
-    }
-
-    function ensureRecord(r) {
+      const loaded = JSON.parse(dec.decode(decrypted));
       return {
-        id: r.id || uid(),
-        mes: normalizeMonth(r.mes ?? r["Mês"] ?? r["Mes"] ?? r.month),
-        tipo: normalizeType(r.tipo ?? r["Tipo"] ?? r.type),
-        bloco: normalizeText(r.bloco ?? r["Bloco"] ?? r.group) || "Despesas Variáveis",
-        categoria: normalizeText(r.categoria ?? r["Categoria"] ?? r.category) || "Geral",
-        item: normalizeText(r.item ?? r["Item"] ?? r.descricao ?? r["Descrição"] ?? r["Descricao"] ?? r.description) || "Sem descrição",
-        valor: parseMoney(r.valor ?? r["Valor"] ?? r.value),
-        obs: normalizeText(r.obs ?? r["Observações"] ?? r["Observacoes"] ?? r.notes ?? "")
+        finance: Array.isArray(loaded.finance) ? loaded.finance.map(ensureFinance) : [],
+        diet: Array.isArray(loaded.diet) ? loaded.diet.map(ensureDiet) : []
       };
     }
-    function getField(row, names) {
-      const keys = Object.keys(row);
+
+    function parseMoney(v) {
+      if (typeof v === "number") return Number.isFinite(v) ? v : 0;
+      let s = String(v ?? "").trim();
+      if (!s) return 0;
+      s = s.replace(/[R$\s]/g, "");
+      if (s.includes(",") && s.includes(".")) s = s.replace(/\./g, "").replace(",", ".");
+      else if (s.includes(",")) s = s.replace(",", ".");
+      const n = parseFloat(s);
+      return Number.isFinite(n) ? n : 0;
+    }
+    function parseDate(v) {
+      if (!v) return "";
+      if (v instanceof Date && !isNaN(v)) return v.toISOString().slice(0,10);
+      if (typeof v === "number") {
+        const d = new Date(Math.round((v - 25569) * 86400 * 1000));
+        return isNaN(d) ? "" : d.toISOString().slice(0,10);
+      }
+      const s = String(v).trim();
+      if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+      const m = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/);
+      if (m) {
+        const yyyy = m[3].length === 2 ? "20" + m[3] : m[3];
+        return `${yyyy}-${m[2].padStart(2,"0")}-${m[1].padStart(2,"0")}`;
+      }
+      return "";
+    }
+    function monthFromDate(date) {
+      const d = parseDate(date);
+      if (!d) return "";
+      const monthIndex = Number(d.slice(5,7)) - 1;
+      return MONTHS[monthIndex] || "";
+    }
+    function normalizeMonth(v, fallbackDate="") {
+      if (!v) return monthFromDate(fallbackDate) || MONTHS[new Date().getMonth()];
+      const raw = stripAccents(v).replace("ç", "c");
+      const map = {
+        "janeiro":"JAN","jan":"JAN","1":"JAN","01":"JAN",
+        "fevereiro":"FEV","fev":"FEV","2":"FEV","02":"FEV",
+        "marco":"MAR","março":"MAR","mar":"MAR","3":"MAR","03":"MAR",
+        "abril":"ABRIL","abr":"ABRIL","4":"ABRIL","04":"ABRIL",
+        "maio":"MAIO","mai":"MAIO","5":"MAIO","05":"MAIO",
+        "junho":"JUN","jun":"JUN","6":"JUN","06":"JUN",
+        "julho":"JUL","jul":"JUL","7":"JUL","07":"JUL",
+        "agosto":"AGO","ago":"AGO","8":"AGO","08":"AGO",
+        "setembro":"SET","set":"SET","9":"SET","09":"SET",
+        "outubro":"OUT","out":"OUT","10":"OUT",
+        "novembro":"NOV","nov":"NOV","11":"NOV",
+        "dezembro":"DEZ","dez":"DEZ","12":"DEZ"
+      };
+      const key = raw.toLowerCase();
+      const upper = raw.toUpperCase();
+      return MONTHS.includes(upper) ? upper : (map[key] || monthFromDate(fallbackDate) || MONTHS[new Date().getMonth()]);
+    }
+    function normalizeFinType(v) {
+      const s = norm(v);
+      if (s.includes("invest")) return "Investimento";
+      if (s.includes("receita") || s.includes("entrada") || s.includes("salario") || s.includes("renda")) return "Receita";
+      return "Despesa";
+    }
+    function normalizeMeal(v) {
+      const s = norm(v);
+      if (!s) return "Outro";
+      if (s.includes("cafe")) return "Café da manhã";
+      if (s.includes("almoco")) return "Almoço";
+      if (s.includes("pre")) return "Pré-treino";
+      if (s.includes("pos")) return "Pós-treino";
+      if (s.includes("jantar")) return "Jantar";
+      if (s.includes("ceia")) return "Ceia";
+      if (s.includes("lanche")) return "Lanche";
+      return MEALS.includes(v) ? v : "Outro";
+    }
+    function findField(row, names) {
+      const keys = Object.keys(row || {});
       for (const wanted of names) {
-        const w = stripAccents(wanted);
-        const found = keys.find(k => stripAccents(k) === w);
+        const w = norm(wanted);
+        const found = keys.find(k => norm(k) === w || norm(k).includes(w));
         if (found) return row[found];
       }
       return "";
     }
-    function normalizeRows(rows) {
-      return rows.map(row => ensureRecord({
-        mes: getField(row, ["Mês", "Mes", "month"]),
-        tipo: getField(row, ["Tipo", "type"]),
-        bloco: getField(row, ["Bloco", "Grupo", "group"]),
-        categoria: getField(row, ["Categoria", "category"]),
-        item: getField(row, ["Item", "Descrição", "Descricao", "Despesa", "description"]),
-        valor: getField(row, ["Valor", "value", "amount"]),
-        obs: getField(row, ["Observações", "Observacoes", "Obs", "notes"])
-      })).filter(r => r.item && Number.isFinite(r.valor) && r.valor > 0);
+    function ensureFinance(r) {
+      const data = parseDate(r.data ?? r.Data ?? findField(r, ["Data"]));
+      const tipo = normalizeFinType(r.tipo ?? r.Tipo ?? findField(r, ["Tipo"]));
+      return {
+        id: r.id || uid(),
+        data,
+        mes: normalizeMonth(r.mes ?? r.Mês ?? r.Mes ?? findField(r, ["Mês","Mes"]), data),
+        tipo,
+        bloco: r.bloco || r.Bloco || findField(r, ["Bloco"]) || (tipo === "Receita" ? "Receitas" : tipo === "Investimento" ? "Investimentos / Previdência / Reserva" : "Despesas Variáveis"),
+        categoria: r.categoria || r.Categoria || findField(r, ["Categoria"]) || "Sem categoria",
+        item: r.item || r.Item || findField(r, ["Item","Descrição","Descricao"]) || "Sem descrição",
+        valor: Math.abs(parseMoney(r.valor ?? r.Valor ?? findField(r, ["Valor"]))),
+        observacoes: r.observacoes || r.Observações || r.Observacoes || findField(r, ["Observações","Observacoes"]) || ""
+      };
     }
-    function filteredRecords() {
-      const month = $("monthFilter").value;
-      const type = $("typeFilter").value;
-      const search = stripAccents($("dashSearch").value);
-      return records.filter(r =>
-        (month === "TODOS" || r.mes === month) &&
-        (type === "TODOS" || r.tipo === type) &&
-        (!search || [r.mes, r.tipo, r.bloco, r.categoria, r.item, r.obs].some(v => stripAccents(v).includes(search)))
-      );
+    function ensureDiet(r) {
+      const data = parseDate(r.data ?? r.Data ?? findField(r, ["Data"])) || todayISO();
+      return {
+        id: r.id || uid(),
+        data,
+        refeicao: normalizeMeal(r.refeicao ?? r.Refeição ?? r.Refeicao ?? findField(r, ["Refeição","Refeicao"])),
+        alimento: r.alimento || r.Alimento || findField(r, ["Alimento"]) || "Sem alimento",
+        quantidade: r.quantidade || r.Quantidade || findField(r, ["Quantidade"]) || "",
+        calorias: Math.max(0, parseMoney(r.calorias ?? r.Calorias ?? findField(r, ["Calorias","Kcal"]))),
+        proteina: Math.max(0, parseMoney(r.proteina ?? r.Proteína ?? r.Proteina ?? findField(r, ["Proteína","Proteina"]))),
+        carboidrato: Math.max(0, parseMoney(r.carboidrato ?? r.Carboidrato ?? r.Carbo ?? findField(r, ["Carboidrato","Carbo"]))),
+        gordura: Math.max(0, parseMoney(r.gordura ?? r.Gordura ?? findField(r, ["Gordura"]))),
+        aguaMl: Math.max(0, parseMoney(r.aguaMl ?? r["Água ml"] ?? r["Agua ml"] ?? r.Agua ?? r.Água ?? findField(r, ["Água ml","Agua ml","Água","Agua"]))),
+        observacoes: r.observacoes || r.Observações || r.Observacoes || findField(r, ["Observações","Observacoes"]) || ""
+      };
     }
-    function tableFilteredRecords() {
-      const month = $("tableMonth").value;
-      const type = $("tableType").value;
-      const search = stripAccents($("tableSearch").value);
-      return records.filter(r =>
-        (month === "TODOS" || r.mes === month) &&
-        (type === "TODOS" || r.tipo === type) &&
-        (!search || [r.mes, r.tipo, r.bloco, r.categoria, r.item, r.obs].some(v => stripAccents(v).includes(search)))
-      );
-    }
-    function totalsFrom(list) {
-      const receitas = list.filter(r => r.tipo === "Receita").reduce((s,r) => s + r.valor, 0);
-      const despesas = list.filter(r => r.tipo === "Despesa").reduce((s,r) => s + r.valor, 0);
-      const invest = list.filter(r => r.tipo === "Investimento").reduce((s,r) => s + r.valor, 0);
-      const resultado = receitas - despesas - invest;
-      const saidas = despesas + invest;
-      const taxa = receitas ? (invest / receitas) : 0;
-      return { receitas, despesas, invest, resultado, saidas, taxa };
-    }
-    function monthlySummary(list = records) {
-      return MONTHS.map(m => {
-        const rows = list.filter(r => r.mes === m);
-        const totals = totalsFrom(rows);
-        return { mes: m, ...totals };
+    function sum(arr, fn) { return arr.reduce((a, r) => a + Number(fn(r) || 0), 0); }
+    function byMonthFinance() {
+      return MONTHS.map(mes => {
+        const rows = state.finance.filter(r => r.mes === mes);
+        const receitas = sum(rows.filter(r => r.tipo === "Receita"), r => r.valor);
+        const despesas = sum(rows.filter(r => r.tipo === "Despesa"), r => r.valor);
+        const investimentos = sum(rows.filter(r => r.tipo === "Investimento"), r => r.valor);
+        return { mes, receitas, despesas, investimentos, resultado: receitas - despesas - investimentos };
       });
     }
-    function categorySummary(list) {
-      const map = new Map();
-      list.filter(r => r.tipo !== "Receita").forEach(r => {
-        const key = r.categoria || "Geral";
-        map.set(key, (map.get(key) || 0) + r.valor);
+    function financeRowsFiltered(forTable=false) {
+      const month = forTable ? $("financeTableMonth").value : $("financeMonthFilter").value;
+      const type = forTable ? $("financeTableType").value : "TODOS";
+      const q = forTable ? norm($("financeSearch").value) : "";
+      return state.finance.filter(r => {
+        if (month && month !== "TODOS" && r.mes !== month) return false;
+        if (type && type !== "TODOS" && r.tipo !== type) return false;
+        if (q && !norm(`${r.bloco} ${r.categoria} ${r.item} ${r.observacoes}`).includes(q)) return false;
+        return true;
       });
-      return Array.from(map.entries()).map(([categoria, valor]) => ({ categoria, valor })).sort((a,b) => b.valor - a.valor).slice(0, 8);
     }
-    function destroyChart(chart) { if (chart) chart.destroy(); }
-    function renderDashboard() {
+    function dietRowsFiltered(forTable=false) {
+      const date = forTable ? $("dietTableDate").value : $("dietDateFilter").value;
+      const meal = forTable ? $("dietTableMeal").value : "TODOS";
+      const q = forTable ? norm($("dietSearch").value) : "";
+      return state.diet.filter(r => {
+        if (date && r.data !== date) return false;
+        if (meal && meal !== "TODOS" && r.refeicao !== meal) return false;
+        if (q && !norm(`${r.refeicao} ${r.alimento} ${r.quantidade} ${r.observacoes}`).includes(q)) return false;
+        return true;
+      });
+    }
+    function groupByDateDiet() {
+      const map = {};
+      for (const r of state.diet) {
+        if (!map[r.data]) map[r.data] = { data: r.data, calorias: 0, proteina: 0, carboidrato: 0, gordura: 0, aguaMl: 0 };
+        map[r.data].calorias += Number(r.calorias || 0);
+        map[r.data].proteina += Number(r.proteina || 0);
+        map[r.data].carboidrato += Number(r.carboidrato || 0);
+        map[r.data].gordura += Number(r.gordura || 0);
+        map[r.data].aguaMl += Number(r.aguaMl || 0);
+      }
+      return Object.values(map).sort((a,b) => a.data.localeCompare(b.data));
+    }
+
+    function chartDefaults() {
+      if (!window.Chart) return;
+      Chart.defaults.color = "#94a3b8";
+      Chart.defaults.borderColor = "rgba(148, 163, 184, .16)";
+      Chart.defaults.font.family = 'Inter, system-ui, -apple-system, "Segoe UI", sans-serif';
+    }
+    function upsertChart(id, type, data, options={}) {
+      if (!window.Chart) return;
+      const ctx = $(id);
+      if (!ctx) return;
+      if (charts[id]) charts[id].destroy();
+      charts[id] = new Chart(ctx, {
+        type,
+        data,
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { position: "bottom" }, tooltip: { mode: "index", intersect: false }, ...(options.plugins || {}) },
+          scales: type === "doughnut" || type === "pie" ? undefined : {
+            x: { grid: { color: "rgba(148, 163, 184, .08)" } },
+            y: { beginAtZero: true, grid: { color: "rgba(148, 163, 184, .08)" } }
+          },
+          ...options
+        }
+      });
+    }
+    function renderAll() {
       fillSelects();
-      const list = filteredRecords();
-      const t = totalsFrom(list);
-      $("kpiReceitas").textContent = money(t.receitas);
-      $("kpiDespesas").textContent = money(t.despesas);
-      $("kpiInvest").textContent = money(t.invest);
-      $("kpiResultado").textContent = money(t.resultado);
-      $("kpiResultado").classList.toggle("good", t.resultado >= 0);
-      $("kpiResultado").classList.toggle("bad", t.resultado < 0);
-      $("subReceitas").textContent = "Entradas filtradas";
-      $("subDespesas").textContent = "Despesas filtradas";
-      $("subInvest").textContent = "Taxa de investimento: " + (t.taxa * 100).toFixed(1).replace(".", ",") + "%";
-      $("subResultado").textContent = t.resultado >= 0 ? "Sobrou no período filtrado" : "Faltou no período filtrado";
-      $("recordCount").textContent = list.length + " lançamentos";
-      renderMonthlyChart(list);
-      renderCategoryChart(list);
-      renderMonthlyTable();
-      renderAlerts();
-    }
-    function renderMonthlyChart(list) {
-      const summary = monthlySummary(list);
-      destroyChart(monthlyChart);
-      const ctx = $("monthlyChart");
-      if (!window.Chart) { ctx.parentElement.innerHTML = '<div class="empty">Não foi possível carregar os gráficos. Verifique a conexão.</div>'; return; }
-      monthlyChart = new Chart(ctx, {
-        type: "bar",
-        data: {
-          labels: summary.map(x => x.mes),
-          datasets: [
-            { label: "Receitas", data: summary.map(x => x.receitas) },
-            { label: "Despesas", data: summary.map(x => x.despesas) },
-            { label: "Investimentos", data: summary.map(x => x.invest) },
-            { label: "Resultado", data: summary.map(x => x.resultado), type: "line", tension: .35 }
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: { legend: { labels: { color: "#dbeafe" } }, tooltip: { callbacks: { label: ctx => ctx.dataset.label + ": " + money(ctx.parsed.y) } } },
-          scales: {
-            x: { ticks: { color: "#cbd5e1" }, grid: { color: "rgba(148,163,184,.10)" } },
-            y: { ticks: { color: "#cbd5e1", callback: v => "R$ " + Number(v).toLocaleString("pt-BR") }, grid: { color: "rgba(148,163,184,.10)" } }
-          }
-        }
-      });
-    }
-    function renderCategoryChart(list) {
-      const cats = categorySummary(list);
-      destroyChart(categoryChart);
-      const ctx = $("categoryChart");
-      if (!window.Chart) { return; }
-      categoryChart = new Chart(ctx, {
-        type: "doughnut",
-        data: { labels: cats.map(x => x.categoria), datasets: [{ data: cats.map(x => x.valor) }] },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: { legend: { position: "bottom", labels: { color: "#dbeafe", boxWidth: 12 } }, tooltip: { callbacks: { label: ctx => ctx.label + ": " + money(ctx.parsed) } } }
-        }
-      });
-    }
-    function renderMonthlyTable() {
-      const summary = monthlySummary(records);
-      const rows = summary.map(s => `<tr><td><span class="pill">${s.mes}</span></td><td>${money(s.receitas)}</td><td>${money(s.despesas)}</td><td>${money(s.invest)}</td><td class="${s.resultado >= 0 ? 'good' : 'bad'}">${money(s.resultado)}</td><td>${s.receitas ? (s.invest/s.receitas*100).toFixed(1).replace('.', ',') + '%' : '0,0%'}</td></tr>`).join("");
-      $("monthlyTable").innerHTML = `<thead><tr><th>Mês</th><th>Receitas</th><th>Despesas</th><th>Investimentos</th><th>Resultado</th><th>% Invest.</th></tr></thead><tbody>${rows}</tbody>`;
-    }
-    function renderAlerts() {
-      if (!records.length) { $("alerts").innerHTML = '<div class="empty">Importe uma planilha ou adicione lançamentos para gerar alertas.</div>'; return; }
-      const summary = monthlySummary(records);
-      const negative = summary.filter(s => s.resultado < 0);
-      const biggestOut = summary.reduce((a,b) => b.saidas > a.saidas ? b : a, summary[0]);
-      const t = totalsFrom(records);
-      const parts = [];
-      if (negative.length) parts.push(`<div class="notice danger-note"><strong>Meses negativos:</strong> ${negative.map(x => x.mes).join(", ")}. Vale revisar despesas e investimentos nesses meses.</div>`);
-      else parts.push(`<div class="notice success"><strong>Nenhum mês negativo.</strong> O resultado mensal está positivo ou zerado.</div>`);
-      parts.push(`<div class="notice"><strong>Maior volume de saídas:</strong> ${biggestOut.mes}, com ${money(biggestOut.saidas)}.</div>`);
-      parts.push(`<div class="notice"><strong>Resultado anual:</strong> ${money(t.resultado)}. Taxa anual de investimento: ${(t.taxa*100).toFixed(1).replace('.', ',')}%.</div>`);
-      $("alerts").innerHTML = parts.join("");
+      renderVisao();
+      renderFinanceDashboard();
+      renderFinanceTable();
+      renderDietDashboard();
+      renderDietTable();
     }
     function fillSelects() {
-      ["monthFilter", "tableMonth"].forEach(id => {
-        const el = $(id);
-        const current = el.value || "TODOS";
-        el.innerHTML = '<option value="TODOS">' + (id === "monthFilter" ? "Ano todo" : "Todos") + '</option>' + MONTHS.map(m => `<option value="${m}">${m}</option>`).join("");
-        el.value = MONTHS.includes(current) ? current : "TODOS";
+      const monthOptions = '<option value="TODOS">Todos</option>' + MONTHS.map(m => `<option>${m}</option>`).join("");
+      ["financeMonthFilter","financeTableMonth"].forEach(id => { const el=$(id); if (el && !el.dataset.done) { el.innerHTML=monthOptions; el.dataset.done="1"; } });
+      const monthOnly = MONTHS.map(m => `<option>${m}</option>`).join("");
+      const finMes = $("finMes"); if (finMes && !finMes.dataset.done) { finMes.innerHTML = monthOnly; finMes.value = monthFromDate(todayISO()); finMes.dataset.done="1"; }
+      const blocos = FIN_BLOCKS.map(b => `<option>${escapeHtml(b)}</option>`).join("");
+      const finBloco = $("finBloco"); if (finBloco && !finBloco.dataset.done) { finBloco.innerHTML = blocos; finBloco.dataset.done="1"; }
+      const mealOptions = MEALS.map(m => `<option>${escapeHtml(m)}</option>`).join("");
+      const mealFilterOptions = '<option value="TODOS">Todas</option>' + mealOptions;
+      const dietMeal = $("dietMeal"); if (dietMeal && !dietMeal.dataset.done) { dietMeal.innerHTML=mealOptions; dietMeal.dataset.done="1"; }
+      const dietTableMeal = $("dietTableMeal"); if (dietTableMeal && !dietTableMeal.dataset.done) { dietTableMeal.innerHTML=mealFilterOptions; dietTableMeal.dataset.done="1"; }
+      const today = todayISO();
+      ["finData","dietData"].forEach(id => { const el=$(id); if (el && !el.value) el.value=today; });
+      const df = $("dietDateFilter"); if (df && !df.dataset.done) { df.value=today; df.dataset.done="1"; }
+    }
+    function renderVisao() {
+      const monthly = byMonthFinance();
+      const receitas = sum(state.finance.filter(r => r.tipo === "Receita"), r => r.valor);
+      const despesas = sum(state.finance.filter(r => r.tipo === "Despesa"), r => r.valor);
+      const inv = sum(state.finance.filter(r => r.tipo === "Investimento"), r => r.valor);
+      const resultado = receitas - despesas - inv;
+      $("kpiVisaoResultado").textContent = money(resultado);
+      $("kpiVisaoResultado").className = "value " + (resultado >= 0 ? "good" : "bad");
+      $("kpiVisaoSaldo").textContent = money(sum(monthly, r => r.resultado));
+      const todayRows = state.diet.filter(r => r.data === todayISO());
+      $("kpiVisaoCalorias").textContent = `${num(sum(todayRows, r => r.calorias))} kcal`;
+      $("kpiVisaoProteina").textContent = `${num(sum(todayRows, r => r.proteina), 1)} g`;
+
+      upsertChart("visaoFinanceChart", "bar", {
+        labels: MONTHS,
+        datasets: [
+          { label: "Receitas", data: monthly.map(r => r.receitas), backgroundColor: "rgba(34, 197, 94, .55)" },
+          { label: "Saídas", data: monthly.map(r => r.despesas + r.investimentos), backgroundColor: "rgba(251, 113, 133, .55)" },
+          { label: "Resultado", data: monthly.map(r => r.resultado), type: "line", borderColor: "#22d3ee", backgroundColor: "rgba(34,211,238,.20)", tension: .35 }
+        ]
       });
-    }
-    function renderRecordsTable() {
-      const rows = tableFilteredRecords();
-      const optionsMonths = MONTHS.map(m => `<option>${m}</option>`).join("");
-      const optionsTypes = TYPES.map(t => `<option>${t}</option>`).join("");
-      const optionsBlocks = BLOCKS.map(b => `<option>${b}</option>`).join("");
-      const body = rows.map(r => `
-        <tr data-id="${r.id}">
-          <td><select data-field="mes">${optionsMonths}</select></td>
-          <td><select data-field="tipo">${optionsTypes}</select></td>
-          <td><select data-field="bloco">${optionsBlocks}</select></td>
-          <td><input data-field="categoria" value="${escapeHtml(r.categoria)}" /></td>
-          <td><input data-field="item" value="${escapeHtml(r.item)}" /></td>
-          <td><input class="money-input" data-field="valor" type="number" min="0" step="0.01" value="${r.valor}" /></td>
-          <td><input data-field="obs" value="${escapeHtml(r.obs || '')}" /></td>
-          <td><button class="small secondary" data-action="duplicate">Duplicar</button> <button class="small danger" data-action="delete">Excluir</button></td>
-        </tr>`).join("");
-      $("recordsTable").innerHTML = `<thead><tr><th>Mês</th><th>Tipo</th><th>Bloco</th><th>Categoria</th><th>Item</th><th>Valor</th><th>Obs.</th><th>Ações</th></tr></thead><tbody>${body || '<tr><td colspan="8"><div class="empty">Nenhum lançamento encontrado.</div></td></tr>'}</tbody>`;
-      rows.forEach(r => {
-        const tr = document.querySelector(`tr[data-id="${r.id}"]`);
-        if (!tr) return;
-        tr.querySelector('[data-field="mes"]').value = r.mes;
-        tr.querySelector('[data-field="tipo"]').value = r.tipo;
-        tr.querySelector('[data-field="bloco"]').value = r.bloco;
+      const days = groupByDateDiet().slice(-10);
+      upsertChart("visaoDietChart", "line", {
+        labels: days.map(d => d.data.split("-").reverse().join("/")),
+        datasets: [
+          { label: "Calorias", data: days.map(d => d.calorias), borderColor: "#8b5cf6", backgroundColor: "rgba(139,92,246,.18)", tension: .35 },
+          { label: "Proteína (g)", data: days.map(d => d.proteina), borderColor: "#22d3ee", backgroundColor: "rgba(34,211,238,.16)", tension: .35 }
+        ]
       });
-      $("tableStatus").textContent = rows.length + " de " + records.length + " lançamentos exibidos.";
+      const neg = monthly.filter(r => r.resultado < 0);
+      $("financeAlerts").innerHTML = neg.length ? neg.map(r => `<div class="mini-row"><strong>${r.mes}</strong><span class="pill bad">${money(r.resultado)}</span></div>`).join("") : `<div class="empty">Nenhum mês negativo lançado até agora.</div>`;
+      $("todayDietList").innerHTML = todayRows.length ? [
+        ["Calorias", `${num(sum(todayRows, r => r.calorias))} kcal`],
+        ["Proteína", `${num(sum(todayRows, r => r.proteina),1)} g`],
+        ["Carboidratos", `${num(sum(todayRows, r => r.carboidrato),1)} g`],
+        ["Água", `${num(sum(todayRows, r => r.aguaMl)/1000,2)} L`],
+      ].map(([a,b]) => `<div class="mini-row"><strong>${a}</strong><span>${b}</span></div>`).join("") : `<div class="empty">Nenhuma refeição lançada para hoje.</div>`;
     }
-    function escapeHtml(s) {
-      return String(s ?? "").replace(/[&<>'"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c]));
+    function renderFinanceDashboard() {
+      const rows = financeRowsFiltered(false);
+      const receitas = sum(rows.filter(r => r.tipo === "Receita"), r => r.valor);
+      const despesas = sum(rows.filter(r => r.tipo === "Despesa"), r => r.valor);
+      const investimentos = sum(rows.filter(r => r.tipo === "Investimento"), r => r.valor);
+      const resultado = receitas - despesas - investimentos;
+      $("kpiReceitas").textContent = money(receitas);
+      $("kpiDespesas").textContent = money(despesas);
+      $("kpiInvestimentos").textContent = money(investimentos);
+      $("kpiResultado").textContent = money(resultado);
+      $("kpiResultado").className = "value " + (resultado >= 0 ? "good" : "bad");
+
+      const monthly = byMonthFinance();
+      upsertChart("financeMonthlyChart", "bar", {
+        labels: MONTHS,
+        datasets: [
+          { label: "Receitas", data: monthly.map(r => r.receitas), backgroundColor: "rgba(34,197,94,.58)" },
+          { label: "Despesas", data: monthly.map(r => r.despesas), backgroundColor: "rgba(251,113,133,.58)" },
+          { label: "Investimentos", data: monthly.map(r => r.investimentos), backgroundColor: "rgba(245,158,11,.58)" },
+          { label: "Resultado", data: monthly.map(r => r.resultado), type: "line", borderColor: "#22d3ee", backgroundColor: "rgba(34,211,238,.20)", tension:.35 }
+        ]
+      });
+      const catMap = {};
+      rows.filter(r => r.tipo !== "Receita").forEach(r => catMap[r.categoria] = (catMap[r.categoria] || 0) + r.valor);
+      const cats = Object.entries(catMap).sort((a,b)=>b[1]-a[1]).slice(0,8);
+      upsertChart("financeCategoryChart", "doughnut", {
+        labels: cats.map(c => c[0]),
+        datasets: [{ label: "Saídas", data: cats.map(c => c[1]), backgroundColor: ["#22d3ee","#8b5cf6","#fb7185","#f59e0b","#22c55e","#60a5fa","#f472b6","#a78bfa"] }]
+      }, { cutout: "62%" });
+
+      $("financeMonthlyTable").innerHTML = `<thead><tr><th>Mês</th><th>Receitas</th><th>Despesas</th><th>Investimentos</th><th>Resultado</th></tr></thead><tbody>` +
+        monthly.map(r => `<tr><td><span class="pill">${r.mes}</span></td><td>${money(r.receitas)}</td><td>${money(r.despesas)}</td><td>${money(r.investimentos)}</td><td><span class="pill ${r.resultado >= 0 ? "good":"bad"}">${money(r.resultado)}</span></td></tr>`).join("") + `</tbody>`;
     }
-    async function updateRecord(id, field, value) {
-      const r = records.find(x => x.id === id);
-      if (!r) return;
-      if (field === "valor") r[field] = parseMoney(value);
-      else if (field === "mes") r[field] = normalizeMonth(value);
-      else if (field === "tipo") r[field] = normalizeType(value);
-      else r[field] = normalizeText(value);
+    function renderFinanceTable() {
+      const rows = financeRowsFiltered(true);
+      $("financeRecordsTable").innerHTML = `<thead><tr><th>Data</th><th>Mês</th><th>Tipo</th><th>Bloco</th><th>Categoria</th><th>Item</th><th>Valor</th><th>Observações</th><th>Ações</th></tr></thead><tbody>` +
+        rows.map(r => `<tr data-id="${r.id}">
+          <td><input type="date" data-fin="data" value="${escapeHtml(r.data)}"></td>
+          <td><select data-fin="mes">${MONTHS.map(m => `<option ${m===r.mes?"selected":""}>${m}</option>`).join("")}</select></td>
+          <td><select data-fin="tipo">${FIN_TYPES.map(t => `<option ${t===r.tipo?"selected":""}>${t}</option>`).join("")}</select></td>
+          <td><select data-fin="bloco">${FIN_BLOCKS.map(b => `<option ${b===r.bloco?"selected":""}>${escapeHtml(b)}</option>`).join("")}</select></td>
+          <td><input data-fin="categoria" value="${escapeHtml(r.categoria)}"></td>
+          <td><input data-fin="item" value="${escapeHtml(r.item)}"></td>
+          <td><input class="money-input" type="number" step="0.01" data-fin="valor" value="${Number(r.valor || 0)}"></td>
+          <td><input data-fin="observacoes" value="${escapeHtml(r.observacoes)}"></td>
+          <td><button class="small secondary" data-action="dup-fin">Duplicar</button> <button class="small danger" data-action="del-fin">Excluir</button></td>
+        </tr>`).join("") + `</tbody>`;
+      $("financeTableStatus").textContent = `${rows.length} lançamento(s) exibido(s) de ${state.finance.length}.`;
+    }
+    function renderDietDashboard() {
+      const rows = dietRowsFiltered(false);
+      $("kpiCalories").textContent = `${num(sum(rows, r => r.calorias))} kcal`;
+      $("kpiProtein").textContent = `${num(sum(rows, r => r.proteina), 1)} g`;
+      $("kpiCarbs").textContent = `${num(sum(rows, r => r.carboidrato), 1)} g`;
+      $("kpiWater").textContent = `${num(sum(rows, r => r.aguaMl) / 1000, 2)} L`;
+
+      const days = groupByDateDiet();
+      upsertChart("dietCaloriesChart", "bar", {
+        labels: days.map(d => d.data.split("-").reverse().join("/")),
+        datasets: [
+          { label: "Calorias", data: days.map(d => d.calorias), backgroundColor: "rgba(139,92,246,.58)" },
+          { label: "Proteína (g)", data: days.map(d => d.proteina), type: "line", borderColor: "#22d3ee", backgroundColor: "rgba(34,211,238,.16)", tension: .35 }
+        ]
+      });
+      const macros = [sum(rows, r => r.proteina), sum(rows, r => r.carboidrato), sum(rows, r => r.gordura)];
+      upsertChart("dietMacroChart", "doughnut", {
+        labels: ["Proteína", "Carboidrato", "Gordura"],
+        datasets: [{ label: "Macros", data: macros, backgroundColor: ["#22d3ee","#8b5cf6","#f59e0b"] }]
+      }, { cutout: "62%" });
+
+      const mealMap = {};
+      for (const r of rows) {
+        if (!mealMap[r.refeicao]) mealMap[r.refeicao] = { calorias:0, proteina:0, carboidrato:0, gordura:0, aguaMl:0 };
+        mealMap[r.refeicao].calorias += Number(r.calorias || 0);
+        mealMap[r.refeicao].proteina += Number(r.proteina || 0);
+        mealMap[r.refeicao].carboidrato += Number(r.carboidrato || 0);
+        mealMap[r.refeicao].gordura += Number(r.gordura || 0);
+        mealMap[r.refeicao].aguaMl += Number(r.aguaMl || 0);
+      }
+      const mealRows = Object.entries(mealMap).sort((a,b) => b[1].calorias - a[1].calorias);
+      $("mealSummaryTable").innerHTML = `<thead><tr><th>Refeição</th><th>Calorias</th><th>Proteína</th><th>Carbo</th><th>Gordura</th><th>Água</th></tr></thead><tbody>` +
+        mealRows.map(([meal, v]) => `<tr><td><span class="pill">${escapeHtml(meal)}</span></td><td>${num(v.calorias)} kcal</td><td>${num(v.proteina,1)} g</td><td>${num(v.carboidrato,1)} g</td><td>${num(v.gordura,1)} g</td><td>${num(v.aguaMl/1000,2)} L</td></tr>`).join("") + `</tbody>`;
+    }
+    function renderDietTable() {
+      const rows = dietRowsFiltered(true);
+      $("dietRecordsTable").innerHTML = `<thead><tr><th>Data</th><th>Refeição</th><th>Alimento</th><th>Qtd.</th><th>Calorias</th><th>Proteína</th><th>Carbo</th><th>Gordura</th><th>Água ml</th><th>Obs.</th><th>Ações</th></tr></thead><tbody>` +
+        rows.map(r => `<tr data-id="${r.id}">
+          <td><input type="date" data-diet="data" value="${escapeHtml(r.data)}"></td>
+          <td><select data-diet="refeicao">${MEALS.map(m => `<option ${m===r.refeicao?"selected":""}>${escapeHtml(m)}</option>`).join("")}</select></td>
+          <td><input data-diet="alimento" value="${escapeHtml(r.alimento)}"></td>
+          <td><input data-diet="quantidade" value="${escapeHtml(r.quantidade)}"></td>
+          <td><input class="num-input" type="number" step="1" data-diet="calorias" value="${Number(r.calorias || 0)}"></td>
+          <td><input class="num-input" type="number" step="0.1" data-diet="proteina" value="${Number(r.proteina || 0)}"></td>
+          <td><input class="num-input" type="number" step="0.1" data-diet="carboidrato" value="${Number(r.carboidrato || 0)}"></td>
+          <td><input class="num-input" type="number" step="0.1" data-diet="gordura" value="${Number(r.gordura || 0)}"></td>
+          <td><input class="num-input" type="number" step="50" data-diet="aguaMl" value="${Number(r.aguaMl || 0)}"></td>
+          <td><input data-diet="observacoes" value="${escapeHtml(r.observacoes)}"></td>
+          <td><button class="small secondary" data-action="dup-diet">Duplicar</button> <button class="small danger" data-action="del-diet">Excluir</button></td>
+        </tr>`).join("") + `</tbody>`;
+      $("dietTableStatus").textContent = `${rows.length} refeição(ões) exibida(s) de ${state.diet.length}.`;
+    }
+
+    function switchTab(tab) {
+      document.querySelectorAll(".tab").forEach(btn => btn.classList.toggle("active", btn.dataset.tab === tab));
+      document.querySelectorAll(".tab-panel").forEach(panel => panel.classList.toggle("hidden", panel.id !== tab));
+      setTimeout(renderAll, 40);
+    }
+    async function saveAndRender() {
       await saveEncrypted();
-      renderDashboard();
+      renderAll();
     }
-    function addRecord() {
-      records.unshift({ id: uid(), mes: MONTHS[new Date().getMonth()], tipo: "Despesa", bloco: "Despesas Variáveis", categoria: "Geral", item: "Novo lançamento", valor: 0, obs: "" });
-      saveEncrypted().then(() => { renderDashboard(); renderRecordsTable(); });
-    }
-    function deleteRecord(id) {
-      records = records.filter(r => r.id !== id);
-      saveEncrypted().then(() => { renderDashboard(); renderRecordsTable(); });
-    }
-    function duplicateRecord(id) {
-      const r = records.find(x => x.id === id);
-      if (!r) return;
-      records.unshift({ ...r, id: uid(), item: r.item + " (cópia)" });
-      saveEncrypted().then(() => { renderDashboard(); renderRecordsTable(); });
-    }
-    function parseCsv(text) {
-      const delimiter = text.includes(";") ? ";" : ",";
-      const lines = text.split(/\r?\n/).filter(Boolean);
-      const headers = splitCsvLine(lines.shift(), delimiter).map(h => h.trim());
-      return lines.map(line => {
-        const cells = splitCsvLine(line, delimiter);
-        const obj = {};
-        headers.forEach((h, i) => obj[h] = cells[i] ?? "");
-        return obj;
-      });
-    }
-    function splitCsvLine(line, delimiter) {
-      const out = [];
-      let cur = ""; let inQuotes = false;
-      for (let i = 0; i < line.length; i++) {
-        const ch = line[i];
-        if (ch === '"' && line[i+1] === '"') { cur += '"'; i++; }
-        else if (ch === '"') inQuotes = !inQuotes;
-        else if (ch === delimiter && !inQuotes) { out.push(cur); cur = ""; }
-        else cur += ch;
-      }
-      out.push(cur);
-      return out;
-    }
-    async function handleFile(file) {
-      if (!file) return [];
-      const name = file.name.toLowerCase();
-      if (name.endsWith(".csv")) {
-        const text = await file.text();
-        return normalizeRows(parseCsv(text));
-      }
-      if ((name.endsWith(".xlsx") || name.endsWith(".xls")) && window.XLSX) {
-        const buffer = await file.arrayBuffer();
-        const workbook = XLSX.read(buffer, { type: "array" });
-        const sheet = workbook.Sheets[workbook.SheetNames[0]];
-        const json = XLSX.utils.sheet_to_json(sheet, { defval: "" });
-        return normalizeRows(json);
-      }
-      throw new Error("Formato não suportado ou biblioteca XLSX não carregada. Tente salvar como CSV.");
-    }
-    async function importData(mode) {
-      const file = $("fileInput").files[0];
-      if (!file) { $("importStatus").textContent = "Escolha um arquivo primeiro."; return; }
-      try {
-        $("importStatus").textContent = "Lendo arquivo...";
-        const imported = await handleFile(file);
-        if (!imported.length) { $("importStatus").textContent = "Nenhuma linha válida encontrada. Confira os cabeçalhos."; return; }
-        records = mode === "replace" ? imported : [...records, ...imported];
-        await saveEncrypted();
-        renderAll();
-        $("importStatus").textContent = `${imported.length} lançamentos importados com sucesso.`;
-      } catch (e) {
-        $("importStatus").textContent = "Erro: " + e.message;
-      }
-    }
-    function download(filename, text, type = "text/plain") {
+    function download(filename, text, type="application/json") {
       const blob = new Blob([text], { type });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
+      a.href = url; a.download = filename; a.click();
       URL.revokeObjectURL(url);
     }
-    function toCsv() {
-      const header = ["Mês", "Tipo", "Bloco", "Categoria", "Item", "Valor", "Observações"];
-      const lines = [header.join(";")];
-      records.forEach(r => {
-        const row = [r.mes, r.tipo, r.bloco, r.categoria, r.item, String(r.valor).replace('.', ','), r.obs || ""];
-        lines.push(row.map(v => '"' + String(v ?? "").replace(/"/g, '""') + '"').join(";"));
-      });
-      return "\ufeff" + lines.join("\n");
+    function stateToCsv(kind) {
+      const rows = kind === "finance" ? state.finance : state.diet;
+      const headers = kind === "finance" ? ["Data","Mês","Tipo","Bloco","Categoria","Item","Valor","Observações"] : ["Data","Refeição","Alimento","Quantidade","Calorias","Proteína","Carboidrato","Gordura","Água ml","Observações"];
+      const lines = [headers.join(";")];
+      for (const r of rows) {
+        const vals = kind === "finance" ? [r.data,r.mes,r.tipo,r.bloco,r.categoria,r.item,r.valor,r.observacoes] : [r.data,r.refeicao,r.alimento,r.quantidade,r.calorias,r.proteina,r.carboidrato,r.gordura,r.aguaMl,r.observacoes];
+        lines.push(vals.map(v => `"${String(v ?? "").replace(/"/g,'""')}"`).join(";"));
+      }
+      return lines.join("\n");
     }
-    function exportCsv() { download("lancamentos_financeiros.csv", toCsv(), "text/csv;charset=utf-8"); }
-    function exportJson() { download("backup_dashboard_financeiro.json", JSON.stringify(records, null, 2), "application/json"); }
-    function exportXlsx() {
-      if (!window.XLSX) { alert("Biblioteca XLSX não carregada. Use a exportação CSV."); return; }
-      const data = records.map(r => ({ "Mês": r.mes, "Tipo": r.tipo, "Bloco": r.bloco, "Categoria": r.categoria, "Item": r.item, "Valor": r.valor, "Observações": r.obs || "" }));
-      const ws = XLSX.utils.json_to_sheet(data);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "Lancamentos");
-      XLSX.writeFile(wb, "lancamentos_financeiros.xlsx");
+    function parseCsv(text) {
+      const rows = [];
+      let cur = [], val = "", inQuotes = false;
+      for (let i=0; i<text.length; i++) {
+        const c = text[i], n = text[i+1];
+        if (c === '"' && inQuotes && n === '"') { val += '"'; i++; }
+        else if (c === '"') inQuotes = !inQuotes;
+        else if ((c === ";" || c === ",") && !inQuotes) { cur.push(val); val = ""; }
+        else if ((c === "\n" || c === "\r") && !inQuotes) {
+          if (c === "\r" && n === "\n") i++;
+          cur.push(val); val = "";
+          if (cur.some(x => String(x).trim() !== "")) rows.push(cur);
+          cur = [];
+        } else val += c;
+      }
+      cur.push(val); if (cur.some(x => String(x).trim() !== "")) rows.push(cur);
+      if (!rows.length) return [];
+      const headers = rows.shift().map(h => String(h).trim());
+      return rows.map(row => Object.fromEntries(headers.map((h, i) => [h, row[i] ?? ""])));
     }
-    function renderAll() { fillSelects(); renderDashboard(); renderRecordsTable(); updateSavedLabel(); }
-
-    $("loginBtn").addEventListener("click", async () => {
-      const pass = $("password").value;
-      $("loginError").textContent = "";
+    async function readRowsFromFile(file) {
+      if (!file) throw new Error("Selecione um arquivo.");
+      const name = file.name.toLowerCase();
+      if (name.endsWith(".csv")) return parseCsv(await file.text());
+      if (!window.XLSX) throw new Error("Biblioteca XLSX não carregou. Use CSV ou atualize a página.");
+      const buffer = await file.arrayBuffer();
+      const wb = XLSX.read(buffer, { type: "array", cellDates: true });
+      const sheet = wb.Sheets[wb.SheetNames[0]];
+      return XLSX.utils.sheet_to_json(sheet, { defval: "" });
+    }
+    async function importFile(kind, mode) {
+      const file = kind === "finance" ? $("financeImportFile").files[0] : $("dietImportFile").files[0];
       try {
-        const hash = await sha256Hex(pass);
-        if (hash !== PASSWORD_HASH) { $("loginError").textContent = "Senha incorreta."; return; }
-        cryptoKey = await deriveKey(pass);
-        try { records = (await loadEncrypted()).map(ensureRecord); }
-        catch { records = []; }
+        const rows = await readRowsFromFile(file);
+        const normalized = kind === "finance" ? rows.map(ensureFinance).filter(r => r.valor > 0 || r.item) : rows.map(ensureDiet).filter(r => r.alimento);
+        if (mode === "replace") state[kind] = normalized;
+        else state[kind] = state[kind].concat(normalized);
+        await saveAndRender();
+        $("importStatus").textContent = `${normalized.length} registro(s) importado(s) em ${kind === "finance" ? "financeiro" : "dieta"}.`;
+      } catch (err) {
+        $("importStatus").textContent = "Erro ao importar: " + err.message;
+      }
+    }
+    function addFinanceSample() {
+      const m = monthFromDate(todayISO());
+      state.finance.push(
+        ensureFinance({ data: todayISO(), mes:m, tipo:"Receita", bloco:"Receitas", categoria:"Salário", item:"Salário líquido", valor:4800 }),
+        ensureFinance({ data: todayISO(), mes:m, tipo:"Despesa", bloco:"Despesas Fixas", categoria:"Academia", item:"Academia", valor:150 }),
+        ensureFinance({ data: todayISO(), mes:m, tipo:"Investimento", bloco:"Investimentos / Previdência / Reserva", categoria:"Previdência", item:"Previdência privada", valor:570 })
+      );
+      saveAndRender();
+    }
+    function addDietSample() {
+      const d = todayISO();
+      state.diet.push(
+        ensureDiet({ data:d, refeicao:"Café da manhã", alimento:"Pão integral + proteína", quantidade:"1 porção", calorias:280, proteina:22, carboidrato:32, gordura:6, aguaMl:300 }),
+        ensureDiet({ data:d, refeicao:"Almoço", alimento:"Arroz, feijão e frango", quantidade:"1 prato", calorias:520, proteina:45, carboidrato:65, gordura:8, aguaMl:400 }),
+        ensureDiet({ data:d, refeicao:"Pós-treino", alimento:"Whey + banana", quantidade:"1 shake", calorias:260, proteina:30, carboidrato:32, gordura:2, aguaMl:500 })
+      );
+      saveAndRender();
+    }
+
+    function bindEvents() {
+      $("loginBtn").addEventListener("click", login);
+      $("password").addEventListener("keydown", e => { if (e.key === "Enter") login(); });
+      $("logoutBtn").addEventListener("click", () => location.reload());
+      $("saveNowBtn").addEventListener("click", async () => { await saveEncrypted(); alert("Dados salvos neste navegador."); });
+      $("exportBackupBtn").addEventListener("click", () => download(`backup_portal_pessoal_${todayISO()}.json`, JSON.stringify(state, null, 2)));
+      $("exportJsonBtn").addEventListener("click", () => download(`backup_portal_pessoal_${todayISO()}.json`, JSON.stringify(state, null, 2)));
+      $("importJsonBtn").addEventListener("click", () => $("jsonImportFile").click());
+      $("jsonImportFile").addEventListener("change", async e => {
+        const file = e.target.files[0];
+        if (!file) return;
+        try {
+          const parsed = JSON.parse(await file.text());
+          state = { finance: Array.isArray(parsed.finance) ? parsed.finance.map(ensureFinance) : [], diet: Array.isArray(parsed.diet) ? parsed.diet.map(ensureDiet) : [] };
+          await saveAndRender();
+          $("importStatus").textContent = "Backup importado com sucesso.";
+        } catch(err) { $("importStatus").textContent = "Erro ao importar backup: " + err.message; }
+      });
+      document.querySelectorAll(".tab").forEach(btn => btn.addEventListener("click", () => switchTab(btn.dataset.tab)));
+      ["financeMonthFilter","financeTableMonth","financeTableType","financeSearch","dietDateFilter","dietTableDate","dietTableMeal","dietSearch"].forEach(id => {
+        const el = $(id); if (el) el.addEventListener("input", renderAll);
+      });
+      $("clearDietDateBtn").addEventListener("click", () => { $("dietDateFilter").value = ""; renderAll(); });
+      $("finData").addEventListener("input", () => { const m = monthFromDate($("finData").value); if (m) $("finMes").value = m; });
+      $("addFinanceBtn").addEventListener("click", async () => {
+        state.finance.push(ensureFinance({ data:$("finData").value, mes:$("finMes").value, tipo:$("finTipo").value, bloco:$("finBloco").value, categoria:$("finCategoria").value, item:$("finItem").value, valor:$("finValor").value, observacoes:$("finObs").value }));
+        ["finCategoria","finItem","finValor","finObs"].forEach(id => $(id).value = "");
+        await saveAndRender();
+      });
+      $("addDietBtn").addEventListener("click", async () => {
+        state.diet.push(ensureDiet({ data:$("dietData").value, refeicao:$("dietMeal").value, alimento:$("dietFood").value, quantidade:$("dietQty").value, calorias:$("dietCalories").value, proteina:$("dietProtein").value, carboidrato:$("dietCarbs").value, gordura:$("dietFat").value, aguaMl:$("dietWater").value, observacoes:$("dietObs").value }));
+        ["dietFood","dietQty","dietCalories","dietProtein","dietCarbs","dietFat","dietWater","dietObs"].forEach(id => $(id).value = "");
+        await saveAndRender();
+      });
+      $("financeRecordsTable").addEventListener("input", async e => {
+        const field = e.target.dataset.fin; if (!field) return;
+        const id = e.target.closest("tr").dataset.id;
+        const r = state.finance.find(x => x.id === id); if (!r) return;
+        r[field] = field === "valor" ? parseMoney(e.target.value) : e.target.value;
+        if (field === "data") r.mes = normalizeMonth(r.mes, r.data);
+        await saveAndRender();
+      });
+      $("financeRecordsTable").addEventListener("click", async e => {
+        const act = e.target.dataset.action; if (!act) return;
+        const id = e.target.closest("tr").dataset.id;
+        const idx = state.finance.findIndex(x => x.id === id);
+        if (idx < 0) return;
+        if (act === "del-fin" && confirm("Excluir este lançamento?")) state.finance.splice(idx, 1);
+        if (act === "dup-fin") state.finance.splice(idx+1, 0, { ...state.finance[idx], id: uid() });
+        await saveAndRender();
+      });
+      $("dietRecordsTable").addEventListener("input", async e => {
+        const field = e.target.dataset.diet; if (!field) return;
+        const id = e.target.closest("tr").dataset.id;
+        const r = state.diet.find(x => x.id === id); if (!r) return;
+        r[field] = ["calorias","proteina","carboidrato","gordura","aguaMl"].includes(field) ? parseMoney(e.target.value) : e.target.value;
+        await saveAndRender();
+      });
+      $("dietRecordsTable").addEventListener("click", async e => {
+        const act = e.target.dataset.action; if (!act) return;
+        const id = e.target.closest("tr").dataset.id;
+        const idx = state.diet.findIndex(x => x.id === id);
+        if (idx < 0) return;
+        if (act === "del-diet" && confirm("Excluir esta refeição?")) state.diet.splice(idx, 1);
+        if (act === "dup-diet") state.diet.splice(idx+1, 0, { ...state.diet[idx], id: uid() });
+        await saveAndRender();
+      });
+      $("importFinanceReplaceBtn").addEventListener("click", () => importFile("finance", "replace"));
+      $("importFinanceAppendBtn").addEventListener("click", () => importFile("finance", "append"));
+      $("importDietReplaceBtn").addEventListener("click", () => importFile("diet", "replace"));
+      $("importDietAppendBtn").addEventListener("click", () => importFile("diet", "append"));
+      $("clearFinanceBtn").addEventListener("click", async () => { if(confirm("Limpar todos os dados financeiros deste navegador?")) { state.finance=[]; await saveAndRender(); } });
+      $("clearDietBtn").addEventListener("click", async () => { if(confirm("Limpar todos os dados de dieta deste navegador?")) { state.diet=[]; await saveAndRender(); } });
+      $("clearAllBtn").addEventListener("click", async () => { if(confirm("Limpar tudo deste navegador?")) { state={finance:[], diet:[]}; await saveAndRender(); } });
+      $("addFinanceSampleBtn").addEventListener("click", addFinanceSample);
+      $("addDietSampleBtn").addEventListener("click", addDietSample);
+    }
+    async function login() {
+      const password = $("password").value;
+      $("loginError").textContent = "";
+      if (!password) { $("loginError").textContent = "Digite a senha."; return; }
+      const hash = await sha256Hex(password);
+      if (hash !== PASSWORD_HASH) { $("loginError").textContent = "Senha incorreta."; return; }
+      try {
+        cryptoKey = await deriveKey(password);
+        state = await loadEncrypted();
         $("login").classList.add("hidden");
         $("app").classList.remove("hidden");
+        chartDefaults();
         renderAll();
-      } catch (e) { $("loginError").textContent = "Erro ao abrir o dashboard: " + e.message; }
-    });
-    $("password").addEventListener("keydown", (e) => { if (e.key === "Enter") $("loginBtn").click(); });
-    document.querySelectorAll(".tab").forEach(btn => btn.addEventListener("click", () => {
-      document.querySelectorAll(".tab").forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      document.querySelectorAll(".tab-panel").forEach(p => p.classList.add("hidden"));
-      $(btn.dataset.tab).classList.remove("hidden");
-      if (btn.dataset.tab === "lancamentos") renderRecordsTable();
-    }));
-    ["monthFilter","typeFilter","dashSearch"].forEach(id => $(id).addEventListener("input", renderDashboard));
-    ["tableMonth","tableType","tableSearch"].forEach(id => $(id).addEventListener("input", renderRecordsTable));
-    $("addRowBtn").addEventListener("click", addRecord);
-    $("recordsTable").addEventListener("change", (e) => {
-      const field = e.target.dataset.field;
-      const tr = e.target.closest("tr[data-id]");
-      if (field && tr) updateRecord(tr.dataset.id, field, e.target.value);
-    });
-    $("recordsTable").addEventListener("click", (e) => {
-      const action = e.target.dataset.action;
-      const tr = e.target.closest("tr[data-id]");
-      if (!action || !tr) return;
-      if (action === "delete" && confirm("Excluir este lançamento?")) deleteRecord(tr.dataset.id);
-      if (action === "duplicate") duplicateRecord(tr.dataset.id);
-    });
-    $("replaceImportBtn").addEventListener("click", () => {
-      if (confirm("Substituir todos os dados atuais pelos dados da planilha?")) importData("replace");
-    });
-    $("mergeImportBtn").addEventListener("click", () => importData("merge"));
-    $("saveBtn").addEventListener("click", () => saveEncrypted().then(() => alert("Dados salvos neste navegador.")));
-    $("exportCsvBtn").addEventListener("click", exportCsv);
-    $("exportCsvTopBtn").addEventListener("click", exportCsv);
-    $("exportJsonBtn").addEventListener("click", exportJson);
-    $("exportXlsxBtn").addEventListener("click", exportXlsx);
-    $("logoutBtn").addEventListener("click", () => location.reload());
-    $("clearBtn").addEventListener("click", () => {
-      if (confirm("Apagar todos os dados salvos neste navegador?")) {
-        localStorage.removeItem(STORAGE_KEY);
-        records = [];
-        saveEncrypted().then(renderAll);
+      } catch (err) {
+        $("loginError").textContent = "Não consegui abrir os dados salvos com essa senha. Se você trocou de senha, importe um backup ou limpe os dados do navegador.";
       }
-    });
+    }
+    bindEvents();
     fillSelects();
   </script>
 </body>
